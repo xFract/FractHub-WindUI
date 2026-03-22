@@ -165,8 +165,8 @@ function OpenButton.New(Window)
         end
     end
     
-    if Window.Icon then
-        OpenButtonMain:SetIcon(Window.Icon)
+    if Window.MinimizeIcon or Window.Icon then
+        OpenButtonMain:SetIcon(Window.MinimizeIcon or Window.Icon)
     end
     
     

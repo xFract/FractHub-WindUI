@@ -29,7 +29,7 @@ local function loadWindUI()
 	end
 
 	local ok, result = pcall(function()
-		return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+		return loadstring(game:HttpGet("https://raw.githubusercontent.com/xFract/FractHub-WindUI/refs/heads/main/dist/main.lua"))()
 	end)
 
 	if ok and result then
@@ -49,10 +49,19 @@ local Window = WindUI:CreateWindow({
 	Theme = "Dark",
 	ToggleKey = Enum.KeyCode.RightShift,
 	SidebarLogo = "rbxassetid://92450040427767",
+	MinimizeIcon = "rbxassetid://92450040427767",
 	SidebarLogoHeight = 120,
 })
 
-local MainTab = Window:Tab({
+local MainSection = Window:Section({
+	Title = "Main Section",
+})
+
+local UtilitySection = Window:Section({
+	Title = "Utility Section",
+})
+
+local MainTab = MainSection:Tab({
 	Title = "Main",
 	Icon = "home",
 })
@@ -141,7 +150,79 @@ MainTab:Keybind({
 	end,
 })
 
-local ExtrasTab = Window:Tab({
+MainTab:Space()
+
+local FarmSection = MainTab:Section({
+	Title = "Farm Settings",
+	Desc = "Section inside the Main tab.",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+FarmSection:Toggle({
+	Title = "Auto Farm",
+	Value = false,
+	Callback = function(state)
+		print("Auto Farm:", state)
+	end,
+})
+
+FarmSection:Space()
+
+FarmSection:Dropdown({
+	Title = "Position",
+	Value = "Above",
+	Values = { "Above", "Below", "Behind" },
+	Callback = function(value)
+		print("Position:", value)
+	end,
+})
+
+FarmSection:Space()
+
+FarmSection:Slider({
+	Title = "Damage Increment",
+	Step = 1,
+	Value = {
+		Min = 0,
+		Max = 10,
+		Default = 5,
+	},
+	Callback = function(value)
+		print("Damage Increment:", value)
+	end,
+})
+
+MainTab:Space()
+
+local LootSection = MainTab:Section({
+	Title = "Loot Settings",
+	Desc = "Another tab section example.",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+LootSection:Toggle({
+	Title = "Auto Loot Chests",
+	Value = true,
+	Callback = function(state)
+		print("Auto Loot Chests:", state)
+	end,
+})
+
+LootSection:Space()
+
+LootSection:Toggle({
+	Title = "Auto Loot Drops",
+	Value = true,
+	Callback = function(state)
+		print("Auto Loot Drops:", state)
+	end,
+})
+
+local ExtrasTab = MainSection:Tab({
 	Title = "Extras",
 	Icon = "boxes",
 })
@@ -198,7 +279,7 @@ BoxSection:Button({
 	end,
 })
 
-local SettingsTab = Window:Tab({
+local SettingsTab = UtilitySection:Tab({
 	Title = "Settings",
 	Icon = "settings",
 })
@@ -235,3 +316,21 @@ SettingsTab:Button({
 		Window:Destroy()
 	end,
 })
+
+local AboutTab = UtilitySection:Tab({
+	Title = "About",
+	Icon = "info",
+})
+
+AboutTab:Section({
+	Title = "Window:Section Example",
+	Desc = "These tabs are grouped in the sidebar by Window:Section.",
+})
+
+AboutTab:Paragraph({
+	Title = "Sidebar Groups",
+	Desc = "Main and Extras are inside Main Section. Settings and About are inside Utility Section.",
+	Image = "folder-tree",
+})
+
+MainTab:Select()

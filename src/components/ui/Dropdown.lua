@@ -609,7 +609,11 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 			or Dropdown.DropdownFrame.UIElements.Main.MouseButton1Click
 		),
 		function()
-			DropdownModule:Open()
+			if Dropdown.Opened then
+				DropdownModule:Close()
+			else
+				DropdownModule:Open()
+			end
 		end
 	)
 

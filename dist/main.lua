@@ -4956,8 +4956,8 @@ ah.Parent=ag.Button.TextButton
 end
 end
 
-if af.Icon then
-ag:SetIcon(af.Icon)
+if af.MinimizeIcon or af.Icon then
+ag:SetIcon(af.MinimizeIcon or af.Icon)
 end
 
 
@@ -7859,7 +7859,11 @@ an.UIElements.Dropdown and an.UIElements.Dropdown.MouseButton1Click
 or an.DropdownFrame.UIElements.Main.MouseButton1Click
 ),
 function()
+if an.Opened then
+ar:Close()
+else
 ar:Open()
+end
 end
 )
 
@@ -11264,6 +11268,7 @@ SideBarWidth=at.SideBarWidth or 200,
 SidebarLogo=at.SidebarLogo,
 SidebarLogoHeight=at.SidebarLogoHeight or 120,
 SidebarLogoPaddingBottom=at.SidebarLogoPaddingBottom or 8,
+MinimizeIcon=at.MinimizeIcon,
 Acrylic=at.Acrylic or false,
 NewElements=at.NewElements or false,
 IgnoreAlerts=at.IgnoreAlerts or false,
@@ -12329,7 +12334,7 @@ p.Size=UDim2.new(0,au.IconSize,0,au.IconSize)
 p.Position=UDim2.new(0.5,0,0.5,0)
 p.AnchorPoint=Vector2.new(0.5,0.5)
 
-au.OpenButtonMain:SetIcon(au.Icon)
+au.OpenButtonMain:SetIcon(au.MinimizeIcon or au.Icon)
 
 
 
@@ -12342,7 +12347,7 @@ au.OpenButtonMain:SetIcon(au.Icon)
 
 
 else
-au.OpenButtonMain:SetIcon(au.Icon)
+au.OpenButtonMain:SetIcon(au.MinimizeIcon or au.Icon)
 
 end
 end)

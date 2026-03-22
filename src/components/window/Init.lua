@@ -60,6 +60,7 @@ return function(Config)
 		SidebarLogo = Config.SidebarLogo,
 		SidebarLogoHeight = Config.SidebarLogoHeight or 120,
 		SidebarLogoPaddingBottom = Config.SidebarLogoPaddingBottom or 8,
+		MinimizeIcon = Config.MinimizeIcon,
 		Acrylic = Config.Acrylic or false,
 		NewElements = Config.NewElements or false,
 		IgnoreAlerts = Config.IgnoreAlerts or false,
@@ -1125,7 +1126,7 @@ return function(Config)
 			WindowIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
 			WindowIcon.AnchorPoint = Vector2.new(0.5, 0.5)
 
-			Window.OpenButtonMain:SetIcon(Window.Icon)
+			Window.OpenButtonMain:SetIcon(Window.MinimizeIcon or Window.Icon)
 
 			-- if Creator.Icon(tostring(Window.Icon)) and Creator.Icon(tostring(Window.Icon))[1] then
 			--     -- ImageLabel.Image = Creator.Icon(Window.Icon)[1]
@@ -1138,7 +1139,7 @@ return function(Config)
 			-- end
 			-- end
 		else
-			Window.OpenButtonMain:SetIcon(Window.Icon)
+			Window.OpenButtonMain:SetIcon(Window.MinimizeIcon or Window.Icon)
 			--OpenButtonIcon.Visible = false
 		end
 	end)
