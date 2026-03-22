@@ -4901,6 +4901,8 @@ ac("UIListLayout",{
 Padding=UDim.new(0,4),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
+HorizontalAlignment="Left",
+Name="ButtonLayout",
 }),
 
 ac("TextButton",{
@@ -4919,6 +4921,8 @@ ac("UIListLayout",{
 Padding=UDim.new(0,af.UIPadding),
 FillDirection="Horizontal",
 VerticalAlignment="Center",
+HorizontalAlignment="Left",
+Name="TextButtonLayout",
 }),
 ai,
 ac("UIPadding",{
@@ -4933,6 +4937,8 @@ PaddingRight=UDim.new(0,4),
 })
 
 ag.Button=an
+local ap1=an:FindFirstChild"ButtonLayout"
+local aq1=an.TextButton:FindFirstChild"TextButtonLayout"
 
 local function ap0(aq)
 if aq then
@@ -4946,9 +4952,17 @@ an.TextButton.UIPadding.PaddingLeft=UDim.new(0,0)
 an.TextButton.UIPadding.PaddingRight=UDim.new(0,0)
 an.TextButton.UICorner.CornerRadius=UDim.new(0,14)
 an.UICorner.CornerRadius=UDim.new(0,14)
+if ap1 then
+ap1.HorizontalAlignment="Center"
+end
+if aq1 then
+aq1.HorizontalAlignment="Center"
+aq1.Padding=UDim.new(0,0)
+end
 if ah then
-ah.AnchorPoint=Vector2.new(0.5,0.5)
-ah.Position=UDim2.new(0.5,0,0.5,0)
+ah.Size=UDim2.new(0,26,0,26)
+ah.AnchorPoint=Vector2.new(0,0)
+ah.Position=UDim2.new(0,0,0,0)
 end
 else
 an.AutomaticSize="X"
@@ -4961,7 +4975,15 @@ an.TextButton.UIPadding.PaddingLeft=UDim.new(0,11)
 an.TextButton.UIPadding.PaddingRight=UDim.new(0,11)
 an.TextButton.UICorner.CornerRadius=UDim.new(1,-4)
 an.UICorner.CornerRadius=UDim.new(1,0)
+if ap1 then
+ap1.HorizontalAlignment="Left"
+end
+if aq1 then
+aq1.HorizontalAlignment="Left"
+aq1.Padding=UDim.new(0,af.UIPadding)
+end
 if ah then
+ah.Size=UDim2.new(0,22,0,22)
 ah.AnchorPoint=Vector2.new(0,0)
 ah.Position=UDim2.new(0,0,0,0)
 end

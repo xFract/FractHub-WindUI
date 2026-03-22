@@ -80,6 +80,9 @@ function OpenButton.New(Window)
         Scale = 1,
     })
 
+    local ButtonLayout
+    local TextButtonLayout
+
     local Button = New("Frame", {
         Size = UDim2.new(0,0,0,44),
         AutomaticSize = "X",
@@ -110,6 +113,8 @@ function OpenButton.New(Window)
             Padding = UDim.new(0, 4),
             FillDirection = "Horizontal",
             VerticalAlignment = "Center",
+            HorizontalAlignment = "Left",
+            Name = "ButtonLayout",
         }),
         
         New("TextButton",{
@@ -128,6 +133,8 @@ function OpenButton.New(Window)
                 Padding = UDim.new(0, Window.UIPadding),
                 FillDirection = "Horizontal",
                 VerticalAlignment = "Center",
+                HorizontalAlignment = "Left",
+                Name = "TextButtonLayout",
             }),
             Title,
             New("UIPadding", {
@@ -142,6 +149,8 @@ function OpenButton.New(Window)
     })
     
     OpenButtonMain.Button = Button
+    ButtonLayout = Button:FindFirstChild("ButtonLayout")
+    TextButtonLayout = Button.TextButton:FindFirstChild("TextButtonLayout")
 
     local function applyVisualMode(isOnlyIcon)
         if isOnlyIcon then
@@ -155,9 +164,17 @@ function OpenButton.New(Window)
             Button.TextButton.UIPadding.PaddingRight = UDim.new(0, 0)
             Button.TextButton.UICorner.CornerRadius = UDim.new(0, 14)
             Button.UICorner.CornerRadius = UDim.new(0, 14)
+            if ButtonLayout then
+                ButtonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            end
+            if TextButtonLayout then
+                TextButtonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                TextButtonLayout.Padding = UDim.new(0, 0)
+            end
             if Icon then
-                Icon.AnchorPoint = Vector2.new(0.5, 0.5)
-                Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
+                Icon.Size = UDim2.new(0, 26, 0, 26)
+                Icon.AnchorPoint = Vector2.new(0, 0)
+                Icon.Position = UDim2.new(0, 0, 0, 0)
             end
         else
             Button.AutomaticSize = "X"
@@ -170,7 +187,15 @@ function OpenButton.New(Window)
             Button.TextButton.UIPadding.PaddingRight = UDim.new(0, 11)
             Button.TextButton.UICorner.CornerRadius = UDim.new(1, -4)
             Button.UICorner.CornerRadius = UDim.new(1, 0)
+            if ButtonLayout then
+                ButtonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+            end
+            if TextButtonLayout then
+                TextButtonLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+                TextButtonLayout.Padding = UDim.new(0, Window.UIPadding)
+            end
             if Icon then
+                Icon.Size = UDim2.new(0,22,0,22)
                 Icon.AnchorPoint = Vector2.new(0, 0)
                 Icon.Position = UDim2.new(0, 0, 0, 0)
             end
