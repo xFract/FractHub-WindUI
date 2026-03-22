@@ -57,6 +57,9 @@ return function(Config)
 		HideSearchBar = Config.HideSearchBar ~= false,
 		ScrollBarEnabled = Config.ScrollBarEnabled or false,
 		SideBarWidth = Config.SideBarWidth or 200,
+		SidebarLogo = Config.SidebarLogo,
+		SidebarLogoHeight = Config.SidebarLogoHeight or 120,
+		SidebarLogoPaddingBottom = Config.SidebarLogoPaddingBottom or 8,
 		Acrylic = Config.Acrylic or false,
 		NewElements = Config.NewElements or false,
 		IgnoreAlerts = Config.IgnoreAlerts or false,
@@ -271,6 +274,45 @@ return function(Config)
 	if Window.ScrollBarEnabled then
 		CreateScrollSlider(Window.UIElements.SideBar, Window.UIElements.SideBarContainer.Content, Window, 3)
 	end
+
+	local function setSidebarLogo(Image)
+		if Window.UIElements.SidebarLogo then
+			Window.UIElements.SidebarLogo:Destroy()
+			Window.UIElements.SidebarLogo = nil
+		end
+
+		if not Image then
+			return
+		end
+
+		local LogoHolder = New("Frame", {
+			Name = "SidebarLogo",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, -7, 0, Window.SidebarLogoHeight),
+			LayoutOrder = -100,
+			Parent = Window.UIElements.SideBar.Frame,
+		}, {
+			New("ImageLabel", {
+				Name = "Logo",
+				BackgroundTransparency = 1,
+				Size = UDim2.new(1, 0, 1, 0),
+				ScaleType = "Fit",
+				Image = Image,
+			}),
+			New("UIPadding", {
+				PaddingBottom = UDim.new(0, Window.SidebarLogoPaddingBottom),
+			}),
+		})
+
+		Window.UIElements.SidebarLogo = LogoHolder
+	end
+
+	function Window:SetSidebarLogo(Image)
+		Window.SidebarLogo = Image
+		setSidebarLogo(Image)
+	end
+
+	setSidebarLogo(Window.SidebarLogo)
 
 	Window.UIElements.MainBar = New("Frame", {
 		Size = UDim2.new(1, -Window.UIElements.SideBarContainer.AbsoluteSize.X, 1, -Window.Topbar.Height),
@@ -1602,6 +1644,66 @@ return function(Config)
 			Config.WindUI.UIScale,
 			Window
 		)
+	end
+
+	function Window:AddSettings(SettingsConfig)
+		SettingsConfig = SettingsConfig or {}
+
+		if Window.Settings then
+			return Window.Settings
+		end
+
+		local ThemeNames = {}
+		for ThemeName, _ in next, Config.WindUI:GetThemes() do
+			table.insert(ThemeNames, ThemeName)
+		end
+		table.sort(ThemeNames)
+
+		local SettingsTab = Window:Tab({
+			Title = SettingsConfig.Title or "Settings",
+			Icon = SettingsConfig.Icon or "settings",
+		})
+
+		local Settings = {
+			Tab = SettingsTab,
+			ThemeDropdown = nil,
+		}
+
+		if SettingsConfig.Theme ~= false then
+			SettingsTab:Section({
+				Title = SettingsConfig.AppearanceTitle or "Appearance",
+				Desc = SettingsConfig.AppearanceDesc or "Customize your interface",
+			})
+
+			Settings.ThemeDropdown = SettingsTab:Dropdown({
+				Title = SettingsConfig.ThemeTitle or "Theme",
+				Desc = SettingsConfig.ThemeDesc,
+				Value = SettingsConfig.ThemeValue or Config.WindUI:GetCurrentTheme(),
+				Values = ThemeNames,
+				Flag = SettingsConfig.ThemeFlag or "windui_theme",
+				SearchBarEnabled = SettingsConfig.SearchBarEnabled ~= false,
+				MenuWidth = SettingsConfig.MenuWidth or 240,
+				Callback = function(ThemeName)
+					if not ThemeName or Config.WindUI:GetCurrentTheme() == ThemeName then
+						return
+					end
+
+					Config.WindUI:SetTheme(ThemeName)
+
+					if SettingsConfig.Notify ~= false then
+						Config.WindUI:Notify({
+							Title = SettingsConfig.NotifyTitle or "Theme Changed",
+							Content = ThemeName,
+							Icon = SettingsConfig.NotifyIcon or "palette",
+							Duration = SettingsConfig.NotifyDuration or 2,
+						})
+					end
+				end,
+			})
+		end
+
+		Window.Settings = Settings
+		return Settings
 	end
 
 	function Window:IsResizable(v)

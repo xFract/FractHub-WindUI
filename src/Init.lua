@@ -379,6 +379,10 @@ function WindUI:CreateWindow(Config)
 		Acrylic.init()
 	end
 
+	if Config.Settings then
+		Window:AddSettings(typeof(Config.Settings) == "table" and Config.Settings or {})
+	end
+
 	-- function Window:ToggleTransparency(Value)
 	--     WindUI.Transparent = Value
 	--     WindUI.Window.Transparent = Value

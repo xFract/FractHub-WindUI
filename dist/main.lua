@@ -11261,6 +11261,9 @@ Transparent=at.Transparent or false,
 HideSearchBar=at.HideSearchBar~=false,
 ScrollBarEnabled=at.ScrollBarEnabled or false,
 SideBarWidth=at.SideBarWidth or 200,
+SidebarLogo=at.SidebarLogo,
+SidebarLogoHeight=at.SidebarLogoHeight or 120,
+SidebarLogoPaddingBottom=at.SidebarLogoPaddingBottom or 8,
 Acrylic=at.Acrylic or false,
 NewElements=at.NewElements or false,
 IgnoreAlerts=at.IgnoreAlerts or false,
@@ -11475,6 +11478,45 @@ au.UIElements.SideBar,
 if au.ScrollBarEnabled then
 aq(au.UIElements.SideBar,au.UIElements.SideBarContainer.Content,au,3)
 end
+
+local function av0(ax0)
+if au.UIElements.SidebarLogo then
+au.UIElements.SidebarLogo:Destroy()
+au.UIElements.SidebarLogo=nil
+end
+
+if not ax0 then
+return
+end
+
+local ay0=am("Frame",{
+Name="SidebarLogo",
+BackgroundTransparency=1,
+Size=UDim2.new(1,-7,0,au.SidebarLogoHeight),
+LayoutOrder=-100,
+Parent=au.UIElements.SideBar.Frame,
+},{
+am("ImageLabel",{
+Name="Logo",
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,1,0),
+ScaleType="Fit",
+Image=ax0,
+}),
+am("UIPadding",{
+PaddingBottom=UDim.new(0,au.SidebarLogoPaddingBottom),
+}),
+})
+
+au.UIElements.SidebarLogo=ay0
+end
+
+function au:SetSidebarLogo(ax0)
+au.SidebarLogo=ax0
+av0(ax0)
+end
+
+av0(au.SidebarLogo)
 
 au.UIElements.MainBar=am("Frame",{
 Size=UDim2.new(1,-au.UIElements.SideBarContainer.AbsoluteSize.X,1,-au.Topbar.Height),
