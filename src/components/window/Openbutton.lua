@@ -142,6 +142,40 @@ function OpenButton.New(Window)
     })
     
     OpenButtonMain.Button = Button
+
+    local function applyVisualMode(isOnlyIcon)
+        if isOnlyIcon then
+            Button.AutomaticSize = "None"
+            Button.Size = UDim2.new(0, 44, 0, 44)
+            Button.UIPadding.PaddingLeft = UDim.new(0, 0)
+            Button.UIPadding.PaddingRight = UDim.new(0, 0)
+            Button.TextButton.AutomaticSize = "None"
+            Button.TextButton.Size = UDim2.new(1, 0, 1, 0)
+            Button.TextButton.UIPadding.PaddingLeft = UDim.new(0, 0)
+            Button.TextButton.UIPadding.PaddingRight = UDim.new(0, 0)
+            Button.TextButton.UICorner.CornerRadius = UDim.new(0, 14)
+            Button.UICorner.CornerRadius = UDim.new(0, 14)
+            if Icon then
+                Icon.AnchorPoint = Vector2.new(0.5, 0.5)
+                Icon.Position = UDim2.new(0.5, 0, 0.5, 0)
+            end
+        else
+            Button.AutomaticSize = "X"
+            Button.Size = UDim2.new(0, 0, 0, 44)
+            Button.UIPadding.PaddingLeft = UDim.new(0, 4)
+            Button.UIPadding.PaddingRight = UDim.new(0, 4)
+            Button.TextButton.AutomaticSize = "XY"
+            Button.TextButton.Size = UDim2.new(0, 0, 0, 36)
+            Button.TextButton.UIPadding.PaddingLeft = UDim.new(0, 11)
+            Button.TextButton.UIPadding.PaddingRight = UDim.new(0, 11)
+            Button.TextButton.UICorner.CornerRadius = UDim.new(1, -4)
+            Button.UICorner.CornerRadius = UDim.new(1, 0)
+            if Icon then
+                Icon.AnchorPoint = Vector2.new(0, 0)
+                Icon.Position = UDim2.new(0, 0, 0, 0)
+            end
+        end
+    end
     
     
     
@@ -162,6 +196,7 @@ function OpenButton.New(Window)
             Icon.Size = UDim2.new(0,22,0,22)
             Icon.LayoutOrder = -1
             Icon.Parent = OpenButtonMain.Button.TextButton
+            applyVisualMode(Title and not Title.Visible)
         end
     end
     
@@ -225,12 +260,15 @@ function OpenButton.New(Window)
         end
         
         
-        if OpenButtonModule.Draggable == false and Drag and Divider then
-            Drag.Visible = OpenButtonModule.Draggable
-            Divider.Visible = OpenButtonModule.Draggable
-            
+        if Drag and Divider then
+            local isDraggable = OpenButtonModule.Draggable ~= false
+            Drag.Visible = isDraggable and not OpenButtonModule.OnlyIcon
+            Divider.Visible = isDraggable and not OpenButtonModule.OnlyIcon
+            Drag.Size = UDim2.new(0, (isDraggable and not OpenButtonModule.OnlyIcon) and 36 or 0, 0, 36)
+            Divider.Size = UDim2.new(0, (isDraggable and not OpenButtonModule.OnlyIcon) and 1 or 0, 1, 0)
+
             if DragModule then
-                DragModule:Set(OpenButtonModule.Draggable)
+                DragModule:Set(isDraggable)
             end
         end
         
@@ -240,13 +278,10 @@ function OpenButton.New(Window)
         
         if OpenButtonModule.OnlyIcon == true and Title then
             Title.Visible = false
-            Button.TextButton.UIPadding.PaddingLeft = UDim.new(0,7)
-            Button.TextButton.UIPadding.PaddingRight = UDim.new(0,7)
         elseif OpenButtonModule.OnlyIcon == false then
             Title.Visible = true
-            Button.TextButton.UIPadding.PaddingLeft = UDim.new(0,7+4)
-            Button.TextButton.UIPadding.PaddingRight = UDim.new(0,7+4)
         end
+        applyVisualMode(OpenButtonModule.OnlyIcon == true)
         
         --OpenButtonMain:Visible((not OpenButtonModule.OnlyMobile) or (not Window.IsPC))
         
@@ -271,7 +306,10 @@ function OpenButton.New(Window)
         end
 
         Button.UICorner.CornerRadius = OpenButtonModule.CornerRadius
-        Button.TextButton.UICorner.CornerRadius = UDim.new(OpenButtonModule.CornerRadius.Scale, OpenButtonModule.CornerRadius.Offset-4)
+        if OpenButtonModule.OnlyIcon ~= true then
+            Button.TextButton.UICorner.CornerRadius =
+                UDim.new(OpenButtonModule.CornerRadius.Scale, OpenButtonModule.CornerRadius.Offset - 4)
+        end
         Button.UIStroke.Thickness = OpenButtonModule.StrokeThickness
         
         OpenButtonMain:SetScale(OpenButtonModule.Scale)

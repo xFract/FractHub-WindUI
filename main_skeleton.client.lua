@@ -49,8 +49,20 @@ local Window = WindUI:CreateWindow({
 	Theme = "Dark",
 	ToggleKey = Enum.KeyCode.RightShift,
 	SidebarLogo = "rbxassetid://92450040427767",
-	MinimizeIcon = "rbxassetid://92450040427767",
+	MinimizeIcon = "rbxassetid://73404955622861",
 	SidebarLogoHeight = 120,
+OpenButton = {
+    Enabled = true,
+    OnlyMobile = false,
+    OnlyIcon = true,
+    Icon = "rbxassetid://73404955622861",
+    Title = "",
+    Draggable = false,
+    Scale = 0.9,
+    StrokeThickness = 0,
+    CornerRadius = UDim.new(0, 18),
+}
+
 })
 
 local MainSection = Window:Section({

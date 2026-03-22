@@ -4934,6 +4934,40 @@ PaddingRight=UDim.new(0,4),
 
 ag.Button=an
 
+local function ap0(aq)
+if aq then
+an.AutomaticSize="None"
+an.Size=UDim2.new(0,44,0,44)
+an.UIPadding.PaddingLeft=UDim.new(0,0)
+an.UIPadding.PaddingRight=UDim.new(0,0)
+an.TextButton.AutomaticSize="None"
+an.TextButton.Size=UDim2.new(1,0,1,0)
+an.TextButton.UIPadding.PaddingLeft=UDim.new(0,0)
+an.TextButton.UIPadding.PaddingRight=UDim.new(0,0)
+an.TextButton.UICorner.CornerRadius=UDim.new(0,14)
+an.UICorner.CornerRadius=UDim.new(0,14)
+if ah then
+ah.AnchorPoint=Vector2.new(0.5,0.5)
+ah.Position=UDim2.new(0.5,0,0.5,0)
+end
+else
+an.AutomaticSize="X"
+an.Size=UDim2.new(0,0,0,44)
+an.UIPadding.PaddingLeft=UDim.new(0,4)
+an.UIPadding.PaddingRight=UDim.new(0,4)
+an.TextButton.AutomaticSize="XY"
+an.TextButton.Size=UDim2.new(0,0,0,36)
+an.TextButton.UIPadding.PaddingLeft=UDim.new(0,11)
+an.TextButton.UIPadding.PaddingRight=UDim.new(0,11)
+an.TextButton.UICorner.CornerRadius=UDim.new(1,-4)
+an.UICorner.CornerRadius=UDim.new(1,0)
+if ah then
+ah.AnchorPoint=Vector2.new(0,0)
+ah.Position=UDim2.new(0,0,0,0)
+end
+end
+end
+
 
 
 function ag.SetIcon(ao,ap)
@@ -4953,6 +4987,7 @@ af.IconThemed
 ah.Size=UDim2.new(0,22,0,22)
 ah.LayoutOrder=-1
 ah.Parent=ag.Button.TextButton
+ap0(ai and not ai.Visible)
 end
 end
 
@@ -5016,12 +5051,15 @@ af.IsPC=false
 end
 
 
-if ar.Draggable==false and aj and ak then
-aj.Visible=ar.Draggable
-ak.Visible=ar.Draggable
+if aj and ak then
+local as=ar.Draggable~=false
+aj.Visible=as and not ar.OnlyIcon
+ak.Visible=as and not ar.OnlyIcon
+aj.Size=UDim2.new(0,(as and not ar.OnlyIcon)and 36 or 0,0,36)
+ak.Size=UDim2.new(0,(as and not ar.OnlyIcon)and 1 or 0,1,0)
 
 if ao then
-ao:Set(ar.Draggable)
+ao:Set(as)
 end
 end
 
@@ -5031,13 +5069,11 @@ end
 
 if ar.OnlyIcon==true and ai then
 ai.Visible=false
-an.TextButton.UIPadding.PaddingLeft=UDim.new(0,7)
-an.TextButton.UIPadding.PaddingRight=UDim.new(0,7)
 elseif ar.OnlyIcon==false then
 ai.Visible=true
-an.TextButton.UIPadding.PaddingLeft=UDim.new(0,11)
-an.TextButton.UIPadding.PaddingRight=UDim.new(0,11)
 end
+
+ap0(ar.OnlyIcon==true)
 
 
 
@@ -5062,7 +5098,9 @@ Glow.UIGradient.Color=ar.Color
 end
 
 an.UICorner.CornerRadius=ar.CornerRadius
+if ar.OnlyIcon~=true then
 an.TextButton.UICorner.CornerRadius=UDim.new(ar.CornerRadius.Scale,ar.CornerRadius.Offset-4)
+end
 an.UIStroke.Thickness=ar.StrokeThickness
 
 ag:SetScale(ar.Scale)
