@@ -537,6 +537,9 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 	local AppearanceSection = tab:Section({
 		Title = options.AppearanceTitle or "Appearance",
 		Desc = options.AppearanceDesc or "Interface options and saved preferences.",
+		Box = true,
+		BoxBorder = true,
+		Opened = true,
 	})
 
 	AppearanceSection:Dropdown({
@@ -588,6 +591,9 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 	local UtilitySection = tab:Section({
 		Title = options.UtilityTitle or "Utility",
 		Desc = options.UtilityDesc or "Quality of life settings.",
+		Box = true,
+		BoxBorder = true,
+		Opened = true,
 	})
 
 	UtilitySection:Toggle({
@@ -610,15 +616,17 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 	})
 
 	UtilitySection:Space()
-    UtilitySection:Input({
-        Title = "Auto Execute Gist",
-        Placeholder = "https://gist.githubusercontent.com/.../raw/script.lua",
-        Value = settings.AutoExecuteGist,
-        Callback = function(value)
-            self:SetAutoExecuteUrl(value)
-            self:SaveSettings()
-        end,
-    })
+	UtilitySection:Input({
+		Title = "Auto Execute Gist",
+		Placeholder = "https://gist.githubusercontent.com/.../raw/script.lua",
+		Value = settings.AutoExecuteGist,
+		Callback = function(value)
+			self:SetAutoExecuteUrl(value)
+			self:SaveSettings()
+		end,
+	})
+
+	UtilitySection:Space()
 
 	UtilitySection:Toggle({
 		Title = "Anti AFK",
@@ -653,6 +661,9 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 	local ServerSection = tab:Section({
 		Title = options.ServerTitle or "Server & Safety",
 		Desc = options.ServerDesc or "Reconnect, hop, and staff detection helpers.",
+		Box = true,
+		BoxBorder = true,
+		Opened = true,
 	})
 
 	ServerSection:Toggle({
