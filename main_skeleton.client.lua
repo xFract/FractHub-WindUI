@@ -71,7 +71,7 @@ local UtilitySection = Window:Section({
 
 local MainTab = MainSection:Tab({
 	Title = "Main",
-	Icon = "home",
+	Icon = "homes",
 })
 
 MainTab:Section({
@@ -341,3 +341,4 @@ AboutTab:Paragraph({
 })
 
 MainTab:Select()
+
