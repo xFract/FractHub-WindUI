@@ -184,14 +184,100 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 		end
 	end
 
-	function DropdownModule:SetValueFast(Items, shouldCallback)
-		if Items then
-			Dropdown.Value = Items
-		else
-			Dropdown.Value = Dropdown.Multi and {} or nil
+	local function NormalizeItems(items)
+		if items == nil then
+			return Dropdown.Multi and {} or nil
 		end
 
+		if Dropdown.Multi then
+			local normalized = {}
+			local selected = {}
+
+			if typeof(items) == "table" then
+				for _, item in ipairs(items) do
+					local title = typeof(item) == "table" and item.Title or item
+					selected[title] = true
+				end
+			else
+				selected[tostring(items)] = true
+			end
+
+			for _, value in ipairs(Dropdown.Values) do
+				local title = typeof(value) == "table" and value.Title or value
+				if selected[title] then
+					table.insert(normalized, value)
+				end
+			end
+
+			return normalized
+		end
+
+		local targetTitle = typeof(items) == "table" and items.Title or items
+		for _, value in ipairs(Dropdown.Values) do
+			local title = typeof(value) == "table" and value.Title or value
+			if title == targetTitle then
+				return value
+			end
+		end
+
+		return items
+	end
+
+	local function ApplyTabSelectionState()
+		if not Dropdown.Tabs then
+			return
+		end
+
+		local selected = {}
+		if Dropdown.Multi and typeof(Dropdown.Value) == "table" then
+			for _, item in ipairs(Dropdown.Value) do
+				local title = typeof(item) == "table" and item.Title or item
+				selected[title] = true
+			end
+		end
+
+		for _, tab in next, Dropdown.Tabs do
+			if tab and tab.UIElements and tab.UIElements.TabItem then
+				local isSelected
+				if Dropdown.Multi then
+					isSelected = selected[tab.Name] == true
+				else
+					local currentValue = typeof(Dropdown.Value) == "table" and Dropdown.Value.Title or Dropdown.Value
+					isSelected = currentValue == tab.Name
+				end
+
+				tab.Selected = isSelected
+				if tab.Locked then
+					tab.UIElements.TabItem.ImageTransparency = 1
+					tab.UIElements.TabItem.Highlight.ImageTransparency = 1
+					tab.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency = 0.6
+					if tab.UIElements.TabIcon then
+						tab.UIElements.TabIcon.ImageLabel.ImageTransparency = 0.6
+					end
+				elseif isSelected then
+					tab.UIElements.TabItem.ImageTransparency = 0.95
+					tab.UIElements.TabItem.Highlight.ImageTransparency = 0.75
+					tab.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency = 0
+					if tab.UIElements.TabIcon then
+						tab.UIElements.TabIcon.ImageLabel.ImageTransparency = 0
+					end
+				else
+					tab.UIElements.TabItem.ImageTransparency = 1
+					tab.UIElements.TabItem.Highlight.ImageTransparency = 1
+					tab.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency = Type == "Dropdown" and 0.4 or 0.05
+					if tab.UIElements.TabIcon then
+						tab.UIElements.TabIcon.ImageLabel.ImageTransparency = Type == "Dropdown" and 0.2 or 0
+					end
+				end
+			end
+		end
+	end
+
+	function DropdownModule:SetValueFast(Items, shouldCallback)
+		Dropdown.Value = NormalizeItems(Items)
+
 		Dropdown.NeedsRefresh = true
+		ApplyTabSelectionState()
 		DropdownModule:Display()
 
 		if shouldCallback ~= false then

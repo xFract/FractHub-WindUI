@@ -7359,13 +7359,99 @@ end)
 end
 end
 
-function ar.SetValueFast(at,au,av)
-if au then
-an.Value=au
-else
-an.Value=an.Multi and{}or nil
+local function NormalizeItems(at)
+if at==nil then
+return an.Multi and{}or nil
 end
+
+if an.Multi then
+local au={}
+local av={}
+
+if typeof(at)=="table"then
+for aw,ax in ipairs(at)do
+local ay=typeof(ax)=="table"and ax.Title or ax
+av[ay]=true
+end
+else
+av[tostring(at)]=true
+end
+
+for aw,ax in ipairs(an.Values)do
+local ay=typeof(ax)=="table"and ax.Title or ax
+if av[ay]then
+table.insert(au,ax)
+end
+end
+
+return au
+end
+
+local au=typeof(at)=="table"and at.Title or at
+for av,aw in ipairs(an.Values)do
+local ax=typeof(aw)=="table"and aw.Title or aw
+if ax==au then
+return aw
+end
+end
+
+return at
+end
+
+local function ApplyTabSelectionState()
+if not an.Tabs then
+return
+end
+
+local at={}
+if an.Multi and typeof(an.Value)=="table"then
+for au,av in ipairs(an.Value)do
+local aw=typeof(av)=="table"and av.Title or av
+at[aw]=true
+end
+end
+
+for au,av in next,an.Tabs do
+if av and av.UIElements and av.UIElements.TabItem then
+local aw
+if an.Multi then
+aw=at[av.Name]==true
+else
+local ax=typeof(an.Value)=="table"and an.Value.Title or an.Value
+aw=ax==av.Name
+end
+
+av.Selected=aw
+if av.Locked then
+av.UIElements.TabItem.ImageTransparency=1
+av.UIElements.TabItem.Highlight.ImageTransparency=1
+av.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0.6
+if av.UIElements.TabIcon then
+av.UIElements.TabIcon.ImageLabel.ImageTransparency=0.6
+end
+elseif aw then
+av.UIElements.TabItem.ImageTransparency=0.95
+av.UIElements.TabItem.Highlight.ImageTransparency=0.75
+av.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=0
+if av.UIElements.TabIcon then
+av.UIElements.TabIcon.ImageLabel.ImageTransparency=0
+end
+else
+av.UIElements.TabItem.ImageTransparency=1
+av.UIElements.TabItem.Highlight.ImageTransparency=1
+av.UIElements.TabItem.Frame.Title.TextLabel.TextTransparency=aq=="Dropdown"and 0.4 or 0.05
+if av.UIElements.TabIcon then
+av.UIElements.TabIcon.ImageLabel.ImageTransparency=aq=="Dropdown"and 0.2 or 0
+end
+end
+end
+end
+end
+
+function ar.SetValueFast(at,au,av)
+an.Value=NormalizeItems(au)
 an.NeedsRefresh=true
+ApplyTabSelectionState()
 ar:Display()
 if av~=false then
 Callback(nil,av)
