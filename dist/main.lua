@@ -5033,7 +5033,11 @@ ab.AddSignal(an.TextButton.MouseLeave,function()
 ad(an.TextButton,.1,{BackgroundTransparency=1}):Play()
 end)
 
-local ao=ab.Drag(al)
+local ao=ab.Drag(al,{
+al,
+an,
+an.TextButton,
+})
 
 
 function ag.Visible(ap,aq)

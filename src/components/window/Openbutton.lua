@@ -245,7 +245,11 @@ function OpenButton.New(Window)
         Tween(Button.TextButton, .1, {BackgroundTransparency = 1}):Play()
     end)
     
-    local DragModule = Creator.Drag(Container)
+    local DragModule = Creator.Drag(Container, {
+        Container,
+        Button,
+        Button.TextButton,
+    })
     
     
     function OpenButtonMain:Visible(v)
