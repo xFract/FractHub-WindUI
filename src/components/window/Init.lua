@@ -1445,7 +1445,9 @@ return function(Config)
 			task.wait(0.4)
 			Window.UIElements.Main.Visible = false
 
-			if Window.OpenButtonMain and not Window.Destroyed and not Window.IsPC and Window.IsOpenButtonEnabled then
+			local canShowMinimizeButton = not Window.IsPC or Window.MinimizeIcon ~= nil
+
+			if Window.OpenButtonMain and not Window.Destroyed and canShowMinimizeButton and Window.IsOpenButtonEnabled then
 				Window.OpenButtonMain:Visible(true)
 			end
 		end)
@@ -1587,7 +1589,7 @@ return function(Config)
 	end
 
 	if Window.OpenButtonMain and Window.OpenButtonMain.Button then
-		Creator.AddSignal(Window.OpenButtonMain.Button.TextButton.MouseButton1Click, function()
+		Creator.AddSignal(Window.OpenButtonMain.Button.MouseButton1Click, function()
 			-- OpenButtonContainer.Visible = false
 			--Window.OpenButtonMain:Visible(false)
 			Window:Open()

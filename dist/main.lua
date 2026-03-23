@@ -4821,71 +4821,40 @@ local ah
 
 
 
-local ai=ac("TextLabel",{
-Text=af.Title,
-TextSize=17,
-FontFace=Font.new(ab.Font,Enum.FontWeight.Medium),
-BackgroundTransparency=1,
-AutomaticSize="XY",
-})
-
-local aj=ac("Frame",{
-Size=UDim2.new(0,36,0,36),
-BackgroundTransparency=1,
-Name="Drag",
-},{
-ac("ImageLabel",{
-Image=ab.Icon"move"[1],
-ImageRectOffset=ab.Icon"move"[2].ImageRectPosition,
-ImageRectSize=ab.Icon"move"[2].ImageRectSize,
-Size=UDim2.new(0,18,0,18),
-BackgroundTransparency=1,
-Position=UDim2.new(0.5,0,0.5,0),
-AnchorPoint=Vector2.new(0.5,0.5),
-ThemeTag={
-ImageColor3="Icon",
-},
-ImageTransparency=.3,
-})
-})
-local ak=ac("Frame",{
-Size=UDim2.new(0,1,1,0),
-Position=UDim2.new(0,36,0.5,0),
-AnchorPoint=Vector2.new(0,0.5),
-BackgroundColor3=Color3.new(1,1,1),
-BackgroundTransparency=.9,
-})
-
-local al=ac("Frame",{
-Size=UDim2.new(0,0,0,0),
-Position=UDim2.new(0.5,0,0,28),
-AnchorPoint=Vector2.new(0.5,0.5),
-Parent=af.Parent,
-BackgroundTransparency=1,
-Active=true,
-Visible=false,
-})
-
-
-local am=ac("UIScale",{
+local ai=ac("UIScale",{
 Scale=1,
 })
 
-local an=ac("Frame",{
-Size=UDim2.new(0,0,0,44),
-AutomaticSize="X",
-Parent=al,
-Active=false,
-BackgroundTransparency=.25,
-ZIndex=99,
+local aj=ac("ImageLabel",{
+Name="Icon",
+BackgroundTransparency=1,
+AnchorPoint=Vector2.new(0.5,0.5),
+Position=UDim2.new(0.5,0,0.5,0),
+Size=UDim2.new(0,28,0,28),
+ScaleType="Fit",
+ImageTransparency=0,
+})
+
+local ak=ac("ImageButton",{
+Name="OpenButton",
+Size=UDim2.new(0,50,0,50),
+Position=UDim2.new(0.5,0,0,28),
+AnchorPoint=Vector2.new(0.5,0.5),
+Parent=af.Parent,
+AutoButtonColor=false,
 BackgroundColor3=Color3.new(0,0,0),
+BackgroundTransparency=0.2,
+ImageTransparency=1,
+Visible=false,
+ZIndex=99,
+Active=true,
 },{
-am,
+ai,
 ac("UICorner",{
-CornerRadius=UDim.new(1,0)
+CornerRadius=UDim.new(0,14)
 }),
 ac("UIStroke",{
-Thickness=1,
+Thickness=0,
 ApplyStrokeMode="Border",
 Color=Color3.new(1,1,1),
 Transparency=0,
@@ -4895,241 +4864,83 @@ Color=ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff")
 })
 }),
 aj,
-ak,
-
-ac("UIListLayout",{
-Padding=UDim.new(0,4),
-FillDirection="Horizontal",
-VerticalAlignment="Center",
-HorizontalAlignment="Left",
-Name="ButtonLayout",
-}),
-
-ac("TextButton",{
-AutomaticSize="XY",
-Active=true,
-BackgroundTransparency=1,
-Size=UDim2.new(0,0,0,36),
-
-BackgroundColor3=Color3.new(1,1,1),
-},{
-ac("UICorner",{
-CornerRadius=UDim.new(1,-4)
-}),
-ah,
-ac("UIListLayout",{
-Padding=UDim.new(0,af.UIPadding),
-FillDirection="Horizontal",
-VerticalAlignment="Center",
-HorizontalAlignment="Left",
-Name="TextButtonLayout",
-}),
-ai,
-ac("UIPadding",{
-PaddingLeft=UDim.new(0,11),
-PaddingRight=UDim.new(0,11),
-}),
-}),
-ac("UIPadding",{
-PaddingLeft=UDim.new(0,4),
-PaddingRight=UDim.new(0,4),
-})
 })
 
-ag.Button=an
-local ap1=an:FindFirstChild"ButtonLayout"
-local aq1=an.TextButton:FindFirstChild"TextButtonLayout"
+local al=ab.Drag(ak,{ak})
 
-local function ap0(aq)
-if aq then
-an.AutomaticSize="None"
-an.Size=UDim2.new(0,44,0,44)
-an.UIPadding.PaddingLeft=UDim.new(0,0)
-an.UIPadding.PaddingRight=UDim.new(0,0)
-an.TextButton.AutomaticSize="None"
-an.TextButton.Size=UDim2.new(1,0,1,0)
-an.TextButton.UIPadding.PaddingLeft=UDim.new(0,0)
-an.TextButton.UIPadding.PaddingRight=UDim.new(0,0)
-an.TextButton.UICorner.CornerRadius=UDim.new(0,14)
-an.UICorner.CornerRadius=UDim.new(0,14)
-if ap1 then
-ap1.HorizontalAlignment="Center"
-end
-if aq1 then
-aq1.HorizontalAlignment="Center"
-aq1.Padding=UDim.new(0,0)
-end
-if ah then
-ah.Size=UDim2.new(0,26,0,26)
-ah.AnchorPoint=Vector2.new(0,0)
-ah.Position=UDim2.new(0,0,0,0)
-end
-else
-an.AutomaticSize="X"
-an.Size=UDim2.new(0,0,0,44)
-an.UIPadding.PaddingLeft=UDim.new(0,4)
-an.UIPadding.PaddingRight=UDim.new(0,4)
-an.TextButton.AutomaticSize="XY"
-an.TextButton.Size=UDim2.new(0,0,0,36)
-an.TextButton.UIPadding.PaddingLeft=UDim.new(0,11)
-an.TextButton.UIPadding.PaddingRight=UDim.new(0,11)
-an.TextButton.UICorner.CornerRadius=UDim.new(1,-4)
-an.UICorner.CornerRadius=UDim.new(1,0)
-if ap1 then
-ap1.HorizontalAlignment="Left"
-end
-if aq1 then
-aq1.HorizontalAlignment="Left"
-aq1.Padding=UDim.new(0,af.UIPadding)
-end
-if ah then
-ah.Size=UDim2.new(0,22,0,22)
-ah.AnchorPoint=Vector2.new(0,0)
-ah.Position=UDim2.new(0,0,0,0)
-end
-end
-end
+ag.Button=ak
 
-
-
-function ag.SetIcon(ao,ap)
-if ah then
-ah:Destroy()
-end
-if ap then
-ah=ab.Image(
-ap,
-af.Title,
-0,
-af.Folder,
-"OpenButton",
-true,
-af.IconThemed
-)
-ah.Size=UDim2.new(0,22,0,22)
-ah.LayoutOrder=-1
-ah.Parent=ag.Button.TextButton
-ap0(ai and not ai.Visible)
-end
+function ag.SetIcon(am,an)
+aj.Image=an or""
+aj.Visible=an~=nil and an~=""
 end
 
 if af.MinimizeIcon or af.Icon then
 ag:SetIcon(af.MinimizeIcon or af.Icon)
 end
 
-
-
-ab.AddSignal(an:GetPropertyChangedSignal"AbsoluteSize",function()
-al.Size=UDim2.new(
-0,an.AbsoluteSize.X,
-0,an.AbsoluteSize.Y
-)
+ab.AddSignal(ak.MouseEnter,function()
+ad(ak,.1,{BackgroundTransparency=.05}):Play()
+end)
+ab.AddSignal(ak.MouseLeave,function()
+ad(ak,.1,{BackgroundTransparency=.2}):Play()
 end)
 
-ab.AddSignal(an.TextButton.MouseEnter,function()
-ad(an.TextButton,.1,{BackgroundTransparency=.93}):Play()
-end)
-ab.AddSignal(an.TextButton.MouseLeave,function()
-ad(an.TextButton,.1,{BackgroundTransparency=1}):Play()
-end)
-
-local ao=ab.Drag(al,{
-al,
-an,
-an.TextButton,
-})
-
-
-function ag.Visible(ap,aq)
-al.Visible=aq
+function ag.Visible(am,an)
+ak.Visible=an
 end
 
-function ag.SetScale(ap,aq)
-am.Scale=aq
+function ag.SetScale(am,an)
+ai.Scale=an
 end
 
-function ag.Edit(ap,aq)
-local ar={
-Title=aq.Title,
-Icon=aq.Icon,
-Enabled=aq.Enabled,
-Position=aq.Position,
-OnlyIcon=aq.OnlyIcon or false,
-Draggable=aq.Draggable or nil,
-OnlyMobile=aq.OnlyMobile,
-CornerRadius=aq.CornerRadius or UDim.new(1,0),
-StrokeThickness=aq.StrokeThickness or 2,
-Scale=aq.Scale or 1,
-Color=aq.Color
-or ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff"),
+function ag.Edit(am,an)
+local ao={
+Title=an.Title,
+Icon=an.Icon,
+Enabled=an.Enabled,
+Position=an.Position,
+Draggable=an.Draggable,
+OnlyMobile=an.OnlyMobile,
+CornerRadius=an.CornerRadius or UDim.new(0,14),
+StrokeThickness=an.StrokeThickness or 0,
+Scale=an.Scale or 1,
+Color=an.Color or ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff"),
+Size=an.Size or UDim2.fromOffset(50,50),
+IconSize=an.IconSize or UDim2.fromOffset(28,28),
+BackgroundTransparency=an.BackgroundTransparency,
 }
 
-
-
-if ar.Enabled==false then
+if ao.Enabled==false then
 af.IsOpenButtonEnabled=false
 end
 
-if ar.OnlyMobile~=false then
-ar.OnlyMobile=true
+if ao.OnlyMobile~=false then
+ao.OnlyMobile=true
 else
 af.IsPC=false
 end
 
-
-if aj and ak then
-local as=ar.Draggable~=false
-aj.Visible=as and not ar.OnlyIcon
-ak.Visible=as and not ar.OnlyIcon
-aj.Size=UDim2.new(0,(as and not ar.OnlyIcon)and 36 or 0,0,36)
-ak.Size=UDim2.new(0,(as and not ar.OnlyIcon)and 1 or 0,1,0)
-
-if ao then
-ao:Set(as)
-end
+if ao.Position then
+ak.Position=ao.Position
 end
 
-if ar.Position and al then
-al.Position=ar.Position
+ak.Size=ao.Size
+aj.Size=ao.IconSize
+ak.UICorner.CornerRadius=ao.CornerRadius
+ak.UIStroke.Thickness=ao.StrokeThickness
+ak.UIStroke.UIGradient.Color=ao.Color
+ak.BackgroundTransparency=ao.BackgroundTransparency or 0.2
+
+if ao.Icon then
+ag:SetIcon(ao.Icon)
 end
 
-if ar.OnlyIcon==true and ai then
-ai.Visible=false
-elseif ar.OnlyIcon==false then
-ai.Visible=true
+if al then
+al:Set(ao.Draggable~=false)
 end
 
-ap0(ar.OnlyIcon==true)
-
-
-
-
-
-if ai then
-if ar.Title then
-ai.Text=ar.Title
-ab:ChangeTranslationKey(ai,ar.Title)
-elseif ar.Title==nil then
-
-end
-end
-
-if ar.Icon then
-ag:SetIcon(ar.Icon)
-end
-
-an.UIStroke.UIGradient.Color=ar.Color
-if Glow then
-Glow.UIGradient.Color=ar.Color
-end
-
-an.UICorner.CornerRadius=ar.CornerRadius
-if ar.OnlyIcon~=true then
-an.TextButton.UICorner.CornerRadius=UDim.new(ar.CornerRadius.Scale,ar.CornerRadius.Offset-4)
-end
-an.UIStroke.Thickness=ar.StrokeThickness
-
-ag:SetScale(ar.Scale)
+ag:SetScale(ao.Scale)
 end
 
 return ag
@@ -12717,7 +12528,9 @@ task.spawn(function()
 task.wait(0.4)
 au.UIElements.Main.Visible=false
 
-if au.OpenButtonMain and not au.Destroyed and not au.IsPC and au.IsOpenButtonEnabled then
+local qD=not au.IsPC or au.MinimizeIcon~=nil
+
+if au.OpenButtonMain and not au.Destroyed and qD and au.IsOpenButtonEnabled then
 au.OpenButtonMain:Visible(true)
 end
 end)
