@@ -6,6 +6,27 @@ local HttpService = cloneref(game:GetService("HttpService"))
 
 local Window 
 
+local function SafeInvokeCallback(element)
+    if not element or type(element.Callback) ~= "function" then
+        return
+    end
+
+    local success, err
+    if element.__type == "Colorpicker" then
+        success, err = pcall(element.Callback, element.Default, element.Transparency)
+    elseif element.__type == "Slider" then
+        success, err = pcall(element.Callback, element.Value and element.Value.Default)
+    elseif element.__type == "Toggle" or element.__type == "Dropdown" or element.__type == "Input" then
+        success, err = pcall(element.Callback, element.Value)
+    else
+        return
+    end
+
+    if not success then
+        warn("[ WindUI.ConfigManager ] Failed to invoke callback for '" .. tostring(element.__type) .. "': " .. tostring(err))
+    end
+end
+
 local ConfigManager
 ConfigManager = {
     Folder = nil,
@@ -239,15 +260,21 @@ function ConfigManager:CreateConfig(configFilename, autoload)
         Window.IsRestoringConfig = true
 
         local appliedCount = 0
+        local callbackQueue = {}
         for name, data in next, (loadData.__elements or {}) do
             if ConfigModule.Elements[name] and ConfigManager.Parser[data.__type] then
+                local element = ConfigModule.Elements[name]
                 local success, err = pcall(function()
-                    ConfigManager.Parser[data.__type].Load(ConfigModule.Elements[name], data)
+                    ConfigManager.Parser[data.__type].Load(element, data)
                 end)
 
                 if not success then
                     warn("[ WindUI.ConfigManager ] Failed to load element '" .. tostring(name) .. "': " .. tostring(err))
                 else
+                    if data.__type ~= "Keybind" then
+                        table.insert(callbackQueue, element)
+                    end
+
                     appliedCount += 1
                     if appliedCount % 1 == 0 then
                         task.wait()
@@ -257,6 +284,15 @@ function ConfigManager:CreateConfig(configFilename, autoload)
         end
 
         Window.IsRestoringConfig = false
+
+        for index, element in ipairs(callbackQueue) do
+            SafeInvokeCallback(element)
+
+            if index % 1 == 0 then
+                task.wait()
+            end
+        end
+
         ConfigModule.CustomData = loadData.__custom or {}
         
         return ConfigModule.CustomData

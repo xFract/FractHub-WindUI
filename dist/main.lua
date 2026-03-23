@@ -4421,6 +4421,27 @@ local ac=aa(game:GetService"HttpService")
 
 local ad
 
+local function SafeInvokeCallback(ae)
+if not ae or type(ae.Callback)~="function"then
+return
+end
+
+local af,ag
+if ae.__type=="Colorpicker"then
+af,ag=pcall(ae.Callback,ae.Default,ae.Transparency)
+elseif ae.__type=="Slider"then
+af,ag=pcall(ae.Callback,ae.Value and ae.Value.Default)
+elseif ae.__type=="Toggle"or ae.__type=="Dropdown"or ae.__type=="Input"then
+af,ag=pcall(ae.Callback,ae.Value)
+else
+return
+end
+
+if not af then
+warn("[ WindUI.ConfigManager ] Failed to invoke callback for '"..tostring(ae.__type).."': "..tostring(ag))
+end
+end
+
 local ae
 ae={
 Folder=nil,
@@ -4654,14 +4675,18 @@ end
 ad.IsRestoringConfig=true
 
 local ao=0
+local ap={}
 for am,an in next,(al.__elements or{})do
 if ai.Elements[am]and ae.Parser[an.__type]then
-local ap,aq=pcall(function()
+local aq,ar=pcall(function()
 ae.Parser[an.__type].Load(ai.Elements[am],an)
 end)
-if not ap then
-warn("[ WindUI.ConfigManager ] Failed to load element '"..tostring(am).."': "..tostring(aq))
+if not aq then
+warn("[ WindUI.ConfigManager ] Failed to load element '"..tostring(am).."': "..tostring(ar))
 else
+if an.__type~="Keybind"then
+table.insert(ap,ai.Elements[am])
+end
 ao+=1
 if ao%1==0 then
 task.wait()
@@ -4671,6 +4696,12 @@ end
 end
 
 ad.IsRestoringConfig=false
+for aq,ar in ipairs(ap)do
+SafeInvokeCallback(ar)
+if aq%1==0 then
+task.wait()
+end
+end
 ai.CustomData=al.__custom or{}
 
 return ai.CustomData
