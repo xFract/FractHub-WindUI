@@ -615,19 +615,6 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 		end,
 	})
 
-	UtilitySection:Space()
-	UtilitySection:Input({
-		Title = "Auto Execute Gist",
-		Placeholder = "https://gist.githubusercontent.com/.../raw/script.lua",
-		Value = settings.AutoExecuteGist,
-		Callback = function(value)
-			self:SetAutoExecuteUrl(value)
-			self:SaveSettings()
-		end,
-	})
-
-	UtilitySection:Space()
-
 	UtilitySection:Toggle({
 		Title = "Anti AFK",
 		Value = settings.AntiAFK,
