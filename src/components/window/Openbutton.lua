@@ -18,14 +18,14 @@ function OpenButton.New(Window)
 		BackgroundTransparency = 1,
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.new(0.5, 0, 0.5, 0),
-		Size = UDim2.new(0, 28, 0, 28),
+		Size = UDim2.new(0, 36, 0, 36),
 		ScaleType = "Fit",
 		ImageTransparency = 0,
 	})
 
 	local Button = New("ImageButton", {
 		Name = "OpenButton",
-		Size = UDim2.new(0, 50, 0, 50),
+		Size = UDim2.new(0, 44, 0, 44),
 		Position = UDim2.new(0.5, 0, 0, 28),
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Parent = Window.Parent,
@@ -95,8 +95,8 @@ function OpenButton.New(Window)
 			StrokeThickness = OpenButtonConfig.StrokeThickness or 0,
 			Scale = OpenButtonConfig.Scale or 1,
 			Color = OpenButtonConfig.Color or ColorSequence.new(Color3.fromHex("40c9ff"), Color3.fromHex("e81cff")),
-			Size = OpenButtonConfig.Size or UDim2.fromOffset(50, 50),
-			IconSize = OpenButtonConfig.IconSize or UDim2.fromOffset(28, 28),
+			Size = OpenButtonConfig.Size or UDim2.fromOffset(44, 44),
+			IconSize = OpenButtonConfig.IconSize or UDim2.fromOffset(36, 36),
 			BackgroundTransparency = OpenButtonConfig.BackgroundTransparency,
 		}
 
