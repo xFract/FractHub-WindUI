@@ -34,7 +34,9 @@ ConfigManager = {
                 }
             end,
             Load = function(element, data)
-                if element and element.Select then
+                if element and element.SetValueFast then
+                    element:SetValueFast(data.value, false)
+                elseif element and element.Select then
                     element:Select(data.value, false)
                 end
             end
@@ -247,7 +249,7 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                     warn("[ WindUI.ConfigManager ] Failed to load element '" .. tostring(name) .. "': " .. tostring(err))
                 else
                     appliedCount += 1
-                    if appliedCount % 10 == 0 then
+                    if appliedCount % 1 == 0 then
                         task.wait()
                     end
                 end

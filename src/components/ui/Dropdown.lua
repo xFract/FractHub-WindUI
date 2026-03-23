@@ -184,6 +184,21 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 		end
 	end
 
+	function DropdownModule:SetValueFast(Items, shouldCallback)
+		if Items then
+			Dropdown.Value = Items
+		else
+			Dropdown.Value = Dropdown.Multi and {} or nil
+		end
+
+		Dropdown.NeedsRefresh = true
+		DropdownModule:Display()
+
+		if shouldCallback ~= false then
+			Callback(nil, shouldCallback)
+		end
+	end
+
 	function DropdownModule:LockValues(lockedItems)
 		if not lockedItems then
 			return
@@ -244,6 +259,7 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 	end
 
 	function DropdownModule:Refresh(Values, shouldCallback)
+		Dropdown.NeedsRefresh = false
 		for _, Elementt in next, Dropdown.UIElements.Menu.Frame.ScrollingFrame:GetChildren() do
 			if not Elementt:IsA("UIListLayout") then
 				Elementt:Destroy()
@@ -551,15 +567,7 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 	DropdownModule:Refresh(Dropdown.Values, false)
 
 	function DropdownModule:Select(Items, shouldCallback)
-		if Items then
-			Dropdown.Value = Items
-		else
-			if Dropdown.Multi then
-				Dropdown.Value = {}
-			else
-				Dropdown.Value = nil
-			end
-		end
+		DropdownModule:SetValueFast(Items, false)
 		DropdownModule:Refresh(Dropdown.Values, shouldCallback)
 	end
 
@@ -568,6 +576,9 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 
 	function DropdownModule:Open()
 		if CanCallback then
+			if Dropdown.NeedsRefresh then
+				DropdownModule:Refresh(Dropdown.Values, false)
+			end
 			Dropdown.UIElements.Menu.Visible = true
 			Dropdown.UIElements.MenuCanvas.Visible = true
 			Dropdown.UIElements.MenuCanvas.Active = true

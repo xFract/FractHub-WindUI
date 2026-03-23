@@ -4449,8 +4449,10 @@ value=af.Value,
 }
 end,
 Load=function(af,ag)
-if af and af.Select then
-af:Select(ag.value)
+if af and af.SetValueFast then
+af:SetValueFast(ag.value,false)
+elseif af and af.Select then
+af:Select(ag.value,false)
 end
 end
 },
@@ -4661,7 +4663,7 @@ if not ap then
 warn("[ WindUI.ConfigManager ] Failed to load element '"..tostring(am).."': "..tostring(aq))
 else
 ao+=1
-if ao%10==0 then
+if ao%1==0 then
 task.wait()
 end
 end
@@ -7305,8 +7307,11 @@ an.UIElements.Dropdown.Frame.Frame.TextLabel.Text=(av==""and"--"or av)
 end
 end
 
-local function Callback(at)
+local function Callback(at,au)
 ar:Display()
+if au==false then
+return
+end
 if an.Callback then
 task.spawn(function()
 aj.SafeCallback(an.Callback,an.Value)
@@ -7315,6 +7320,19 @@ else
 task.spawn(function()
 aj.SafeCallback(at)
 end)
+end
+end
+
+function ar.SetValueFast(at,au,av)
+if au then
+an.Value=au
+else
+an.Value=an.Multi and{}or nil
+end
+an.NeedsRefresh=true
+ar:Display()
+if av~=false then
+Callback(nil,av)
 end
 end
 
@@ -7377,7 +7395,8 @@ end
 end
 end
 
-function ar.Refresh(at,au)
+function ar.Refresh(at,au,av)
+an.NeedsRefresh=false
 for av,aw in next,an.UIElements.Menu.Frame.ScrollingFrame:GetChildren()do
 if not aw:IsA"UIListLayout"then
 aw:Destroy()
@@ -7677,24 +7696,16 @@ an.MenuWidth+6+6+5+5+18+6+6,
 an.UIElements.MenuCanvas.Size.Y.Scale,
 an.UIElements.MenuCanvas.Size.Y.Offset
 )
-Callback()
+Callback(nil,av)
 
 an.Values=au
 end
 
-ar:Refresh(an.Values)
+ar:Refresh(an.Values,false)
 
-function ar.Select(at,au)
-if au then
-an.Value=au
-else
-if an.Multi then
-an.Value={}
-else
-an.Value=nil
-end
-end
-ar:Refresh(an.Values)
+function ar.Select(at,au,av)
+ar:SetValueFast(au,false)
+ar:Refresh(an.Values,av)
 end
 
 RecalculateListSize()
@@ -7702,6 +7713,9 @@ RecalculateCanvasSize()
 
 function ar.Open(at)
 if ap then
+if an.NeedsRefresh then
+ar:Refresh(an.Values,false)
+end
 an.UIElements.Menu.Visible=true
 an.UIElements.MenuCanvas.Visible=true
 an.UIElements.MenuCanvas.Active=true
@@ -7889,6 +7903,7 @@ ao.DropdownMenu=aj(an,ao,al,ap,"Dropdown")
 ao.Display=ao.DropdownMenu.Display
 ao.Refresh=ao.DropdownMenu.Refresh
 ao.Select=ao.DropdownMenu.Select
+ao.SetValueFast=ao.DropdownMenu.SetValueFast
 ao.Open=ao.DropdownMenu.Open
 ao.Close=ao.DropdownMenu.Close
 
