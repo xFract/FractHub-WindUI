@@ -614,7 +614,8 @@ function InterfaceManager:BuildInterfaceSection(tab, options)
 			self:SaveSettings()
 		end,
 	})
-
+	
+	UtilitySection:Space()
 	UtilitySection:Toggle({
 		Title = "Anti AFK",
 		Value = settings.AntiAFK,
