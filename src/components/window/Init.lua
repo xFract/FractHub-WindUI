@@ -207,15 +207,23 @@ return function(Config)
 	--     }
 	-- })
 
+	local function getSidebarLogoOffset()
+		if not Window.SidebarLogo then
+			return 0
+		end
+
+		return Window.SidebarLogoHeight + Window.SidebarLogoPaddingBottom
+	end
+
 	Window.UIElements.SideBar = New("ScrollingFrame", {
 		Size = UDim2.new(
 			1,
 			Window.ScrollBarEnabled and -3 - (Window.UIPadding / 2) or 0,
 			1,
-			not Window.HideSearchBar and -39 - 6 or 0
+			(not Window.HideSearchBar and -39 - 6 or 0) - getSidebarLogoOffset()
 		),
-		Position = UDim2.new(0, 0, 1, 0),
-		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 0, 0, getSidebarLogoOffset()),
+		AnchorPoint = Vector2.new(0, 0),
 		BackgroundTransparency = 1,
 		ScrollBarThickness = 0,
 		ElasticBehavior = "Never",
@@ -263,17 +271,52 @@ return function(Config)
 		Visible = true,
 	}, {
 		New("Frame", {
+			Name = "SidebarLogoContainer",
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, getSidebarLogoOffset()),
+			Position = UDim2.new(0, 0, 0, 0),
+		}),
+		New("Frame", {
 			Name = "Content",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, 0, 1, not Window.HideSearchBar and -39 - 6 - Window.UIPadding / 2 or 0),
-			Position = UDim2.new(0, 0, 1, 0),
-			AnchorPoint = Vector2.new(0, 1),
+			Size = UDim2.new(
+				1,
+				0,
+				1,
+				(not Window.HideSearchBar and -39 - 6 - Window.UIPadding / 2 or 0) - getSidebarLogoOffset()
+			),
+			Position = UDim2.new(0, 0, 0, getSidebarLogoOffset()),
+			AnchorPoint = Vector2.new(0, 0),
 		}),
 		Window.UIElements.SideBar,
 	})
 
+	Window.UIElements.SidebarLogoContainer = Window.UIElements.SideBarContainer.SidebarLogoContainer
+
 	if Window.ScrollBarEnabled then
 		CreateScrollSlider(Window.UIElements.SideBar, Window.UIElements.SideBarContainer.Content, Window, 3)
+	end
+
+	local function updateSidebarLayout()
+		local LogoOffset = getSidebarLogoOffset()
+
+		Window.UIElements.SideBar.Position = UDim2.new(0, 0, 0, LogoOffset)
+		Window.UIElements.SideBar.Size = UDim2.new(
+			1,
+			Window.ScrollBarEnabled and -3 - (Window.UIPadding / 2) or 0,
+			1,
+			(not Window.HideSearchBar and -39 - 6 or 0) - LogoOffset
+		)
+
+		Window.UIElements.SideBarContainer.Content.Position = UDim2.new(0, 0, 0, LogoOffset)
+		Window.UIElements.SideBarContainer.Content.Size = UDim2.new(
+			1,
+			0,
+			1,
+			(not Window.HideSearchBar and -39 - 6 - Window.UIPadding / 2 or 0) - LogoOffset
+		)
+
+		Window.UIElements.SidebarLogoContainer.Size = UDim2.new(1, 0, 0, LogoOffset)
 	end
 
 	local function setSidebarLogo(Image)
@@ -283,15 +326,16 @@ return function(Config)
 		end
 
 		if not Image then
+			updateSidebarLayout()
 			return
 		end
 
 		local LogoHolder = New("Frame", {
 			Name = "SidebarLogo",
 			BackgroundTransparency = 1,
-			Size = UDim2.new(1, -7, 0, Window.SidebarLogoHeight),
-			LayoutOrder = -100,
-			Parent = Window.UIElements.SideBar.Frame,
+			Size = UDim2.new(1, -Window.UIPadding, 0, Window.SidebarLogoHeight),
+			Position = UDim2.new(0, Window.UIPadding / 2, 0, 0),
+			Parent = Window.UIElements.SidebarLogoContainer,
 		}, {
 			New("ImageLabel", {
 				Name = "Logo",
@@ -306,6 +350,7 @@ return function(Config)
 		})
 
 		Window.UIElements.SidebarLogo = LogoHolder
+		updateSidebarLayout()
 	end
 
 	function Window:SetSidebarLogo(Image)
@@ -313,6 +358,7 @@ return function(Config)
 		setSidebarLogo(Image)
 	end
 
+	updateSidebarLayout()
 	setSidebarLogo(Window.SidebarLogo)
 
 	Window.UIElements.MainBar = New("Frame", {

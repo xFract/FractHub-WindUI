@@ -11286,15 +11286,22 @@ Active=false,
 
 
 
+local function av_sidebarOffset()
+if not au.SidebarLogo then
+return 0
+end
+return au.SidebarLogoHeight+au.SidebarLogoPaddingBottom
+end
+
 au.UIElements.SideBar=am("ScrollingFrame",{
 Size=UDim2.new(
 1,
 au.ScrollBarEnabled and-3-(au.UIPadding/2)or 0,
 1,
-not au.HideSearchBar and-45 or 0
+(not au.HideSearchBar and-45 or 0)-av_sidebarOffset()
 ),
-Position=UDim2.new(0,0,1,0),
-AnchorPoint=Vector2.new(0,1),
+Position=UDim2.new(0,0,0,av_sidebarOffset()),
+AnchorPoint=Vector2.new(0,0),
 BackgroundTransparency=1,
 ScrollBarThickness=0,
 ElasticBehavior="Never",
@@ -11311,9 +11318,6 @@ Size=UDim2.new(1,0,0,0),
 Name="Frame",
 },{
 am("UIPadding",{
-
-
-
 PaddingBottom=UDim.new(0,au.UIPadding/2),
 }),
 am("UIListLayout",{
@@ -11322,12 +11326,9 @@ Padding=UDim.new(0,au.Gap),
 }),
 }),
 am("UIPadding",{
-
 PaddingLeft=UDim.new(0,au.UIPadding/2),
 PaddingRight=UDim.new(0,au.UIPadding/2),
-
 }),
-
 })
 
 au.UIElements.SideBarContainer=am("Frame",{
@@ -11342,17 +11343,34 @@ BackgroundTransparency=1,
 Visible=true,
 },{
 am("Frame",{
+Name="SidebarLogoContainer",
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,0,av_sidebarOffset()),
+Position=UDim2.new(0,0,0,0),
+}),
+am("Frame",{
 Name="Content",
 BackgroundTransparency=1,
-Size=UDim2.new(1,0,1,not au.HideSearchBar and-45-au.UIPadding/2 or 0),
-Position=UDim2.new(0,0,1,0),
-AnchorPoint=Vector2.new(0,1),
+Size=UDim2.new(1,0,1,(not au.HideSearchBar and-45-au.UIPadding/2 or 0)-av_sidebarOffset()),
+Position=UDim2.new(0,0,0,av_sidebarOffset()),
+AnchorPoint=Vector2.new(0,0),
 }),
 au.UIElements.SideBar,
 })
 
+au.UIElements.SidebarLogoContainer=au.UIElements.SideBarContainer.SidebarLogoContainer
+
 if au.ScrollBarEnabled then
 aq(au.UIElements.SideBar,au.UIElements.SideBarContainer.Content,au,3)
+end
+
+local function av_updateSidebarLayout()
+local ax0=av_sidebarOffset()
+au.UIElements.SideBar.Position=UDim2.new(0,0,0,ax0)
+au.UIElements.SideBar.Size=UDim2.new(1,au.ScrollBarEnabled and-3-(au.UIPadding/2)or 0,1,(not au.HideSearchBar and-45 or 0)-ax0)
+au.UIElements.SideBarContainer.Content.Position=UDim2.new(0,0,0,ax0)
+au.UIElements.SideBarContainer.Content.Size=UDim2.new(1,0,1,(not au.HideSearchBar and-45-au.UIPadding/2 or 0)-ax0)
+au.UIElements.SidebarLogoContainer.Size=UDim2.new(1,0,0,ax0)
 end
 
 local function av0(ax0)
@@ -11362,15 +11380,16 @@ au.UIElements.SidebarLogo=nil
 end
 
 if not ax0 then
+av_updateSidebarLayout()
 return
 end
 
 local ay0=am("Frame",{
 Name="SidebarLogo",
 BackgroundTransparency=1,
-Size=UDim2.new(1,-7,0,au.SidebarLogoHeight),
-LayoutOrder=-100,
-Parent=au.UIElements.SideBar.Frame,
+Size=UDim2.new(1,-au.UIPadding,0,au.SidebarLogoHeight),
+Position=UDim2.new(0,au.UIPadding/2,0,0),
+Parent=au.UIElements.SidebarLogoContainer,
 },{
 am("ImageLabel",{
 Name="Logo",
@@ -11385,6 +11404,7 @@ PaddingBottom=UDim.new(0,au.SidebarLogoPaddingBottom),
 })
 
 au.UIElements.SidebarLogo=ay0
+av_updateSidebarLayout()
 end
 
 function au:SetSidebarLogo(ax0)
@@ -11392,6 +11412,7 @@ au.SidebarLogo=ax0
 av0(ax0)
 end
 
+av_updateSidebarLayout()
 av0(au.SidebarLogo)
 
 au.UIElements.MainBar=am("Frame",{

@@ -88,6 +88,19 @@ MainTab:Dropdown({
 		print(value)
 	end,
 })
+Multi = true で複数選択もできる。
+MainTab:Dropdown({
+	Title = "Select Items",
+	Value = {},
+	Values = { "Sword", "Shield", "Potion" },
+	Multi = true,
+	SearchBarEnabled = true,
+	Callback = function(values)
+		for name, selected in pairs(values) do
+			print(name, selected)
+		end
+	end,
+})
 ドロップダウン。Refresh / Select も使える。
 
 MainTab:Keybind({
