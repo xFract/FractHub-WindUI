@@ -4422,23 +4422,25 @@ local ac=aa(game:GetService"HttpService")
 local ad
 
 local function SafeInvokeCallback(ae)
-if not ae or type(ae.Callback)~="function"then
+if not ae or not ae.element or type(ae.element.Callback)~="function"then
 return
 end
 
-local af,ag
-if ae.__type=="Colorpicker"then
-af,ag=pcall(ae.Callback,ae.Default,ae.Transparency)
-elseif ae.__type=="Slider"then
-af,ag=pcall(ae.Callback,ae.Value and ae.Value.Default)
-elseif ae.__type=="Toggle"or ae.__type=="Dropdown"or ae.__type=="Input"then
-af,ag=pcall(ae.Callback,ae.Value)
+local af=ae.element
+local ag=ae.data or{}
+local ah,ai
+if af.__type=="Colorpicker"then
+ah,ai=pcall(af.Callback,Color3.fromHex(ag.value),ag.transparency)
+elseif af.__type=="Slider"then
+ah,ai=pcall(af.Callback,tonumber(ag.value))
+elseif af.__type=="Toggle"or af.__type=="Dropdown"or af.__type=="Input"then
+ah,ai=pcall(af.Callback,ag.value)
 else
 return
 end
 
-if not af then
-warn("[ WindUI.ConfigManager ] Failed to invoke callback for '"..tostring(ae.__type).."': "..tostring(ag))
+if not ah then
+warn("[ WindUI.ConfigManager ] Failed to invoke callback for '"..tostring(af.__type).."': "..tostring(ai))
 end
 end
 
@@ -4512,7 +4514,7 @@ value=af.Value.Default,
 end,
 Load=function(af,ag)
 if af and af.Set then
-af:Set(tonumber(ag.value))
+af:Set(tonumber(ag.value),nil,false,true)
 end
 end
 },
@@ -4685,7 +4687,10 @@ if not aq then
 warn("[ WindUI.ConfigManager ] Failed to load element '"..tostring(am).."': "..tostring(ar))
 else
 if an.__type~="Keybind"then
-table.insert(ap,ai.Elements[am])
+table.insert(ap,{
+element=ai.Elements[am],
+data=an,
+})
 end
 ao+=1
 if ao%1==0 then
@@ -6743,7 +6748,7 @@ end
 
 local ay=ak.Tab.UIElements.ContainerFrame
 
-function al.Set(az,aA,aB)
+function al.Set(az,aA,aB,aC)
 if as then
 if not al.IsFocusing and not ai and(not aB or(aB.UserInputType==Enum.UserInputType.MouseButton1 or aB.UserInputType==Enum.UserInputType.Touch))then
 if aB then
@@ -6756,7 +6761,7 @@ local d=math.clamp((b-al.UIElements.SliderIcon.AbsolutePosition.X)/al.UIElements
 aA=CalculateValue(al.Value.Min+d*(al.Value.Max-al.Value.Min))
 aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
 
-if aA~=aq then
+if aA~=aq or aC then
 ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(d,0,1,0)}):Play()
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
 if ax then ax.TitleFrame.Text=FormatValue(aA)end
@@ -6770,7 +6775,7 @@ local f=am and aB.Position.X or ac:GetMouseLocation().X
 local g=math.clamp((f-al.UIElements.SliderIcon.AbsolutePosition.X)/al.UIElements.SliderIcon.AbsoluteSize.X,0,1)
 aA=CalculateValue(al.Value.Min+g*(al.Value.Max-al.Value.Min))
 
-if aA~=aq then
+if aA~=aq or aC then
 ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(g,0,1,0)}):Play()
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
 if ax then ax.TitleFrame.Text=FormatValue(aA)end
@@ -6800,7 +6805,7 @@ aA=math.clamp(aA,al.Value.Min or 0,al.Value.Max or 100)
 local b=math.clamp((aA-(al.Value.Min or 0))/((al.Value.Max or 100)-(al.Value.Min or 0)),0,1)
 aA=CalculateValue(al.Value.Min+b*(al.Value.Max-al.Value.Min))
 
-if aA~=aq then
+if aA~=aq or aC then
 ag(al.UIElements.SliderIcon.Frame,0.05,{Size=UDim2.new(b,0,1,0)}):Play()
 al.UIElements.SliderContainer.TextBox.Text=FormatValue(aA)
 if ax then ax.TitleFrame.Text=FormatValue(aA)end

@@ -6,18 +6,20 @@ local HttpService = cloneref(game:GetService("HttpService"))
 
 local Window 
 
-local function SafeInvokeCallback(element)
-    if not element or type(element.Callback) ~= "function" then
+local function SafeInvokeCallback(entry)
+    if not entry or not entry.element or type(entry.element.Callback) ~= "function" then
         return
     end
 
+    local element = entry.element
+    local data = entry.data or {}
     local success, err
     if element.__type == "Colorpicker" then
-        success, err = pcall(element.Callback, element.Default, element.Transparency)
+        success, err = pcall(element.Callback, Color3.fromHex(data.value), data.transparency)
     elseif element.__type == "Slider" then
-        success, err = pcall(element.Callback, element.Value and element.Value.Default)
+        success, err = pcall(element.Callback, tonumber(data.value))
     elseif element.__type == "Toggle" or element.__type == "Dropdown" or element.__type == "Input" then
-        success, err = pcall(element.Callback, element.Value)
+        success, err = pcall(element.Callback, data.value)
     else
         return
     end
@@ -97,7 +99,7 @@ ConfigManager = {
             end,
             Load = function(element, data)
                 if element and element.Set then
-                    element:Set(tonumber(data.value), nil, false)
+                    element:Set(tonumber(data.value), nil, false, true)
                 end
             end
         },
@@ -272,7 +274,10 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                     warn("[ WindUI.ConfigManager ] Failed to load element '" .. tostring(name) .. "': " .. tostring(err))
                 else
                     if data.__type ~= "Keybind" then
-                        table.insert(callbackQueue, element)
+                        table.insert(callbackQueue, {
+                            element = element,
+                            data = data,
+                        })
                     end
 
                     appliedCount += 1

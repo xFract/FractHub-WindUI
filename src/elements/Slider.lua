@@ -224,7 +224,7 @@ function Element:New(Config)
     --local ScrollingFrameParent = Slider.SliderFrame.Parent:IsA("ScrollingFrame") and Slider.SliderFrame.Parent or Slider.SliderFrame.Parent.Parent.Parent
     local ScrollingFrameParent = Config.Tab.UIElements.ContainerFrame
     
-    function Slider:Set(Value, input, ShouldCallback)
+    function Slider:Set(Value, input, ShouldCallback, ForceSet)
         if CanCallback then
             if not Slider.IsFocusing and not IsSliderHolding and (not input or (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch)) then
                 if input then
@@ -237,7 +237,7 @@ function Element:New(Config)
                     Value = CalculateValue(Slider.Value.Min + delta * (Slider.Value.Max - Slider.Value.Min))
                     Value = math.clamp(Value, Slider.Value.Min or 0, Slider.Value.Max or 100)
                     
-                    if Value ~= LastValue then
+                    if Value ~= LastValue or ForceSet then
                         Tween(Slider.UIElements.SliderIcon.Frame, 0.05, {Size = UDim2.new(delta,0,1,0)}):Play()
                         Slider.UIElements.SliderContainer.TextBox.Text = FormatValue(Value)
                         if Tooltip then Tooltip.TitleFrame.Text = FormatValue(Value) end
@@ -253,7 +253,7 @@ function Element:New(Config)
                         local delta = math.clamp((inputPosition - Slider.UIElements.SliderIcon.AbsolutePosition.X) / Slider.UIElements.SliderIcon.AbsoluteSize.X, 0, 1)
                         Value = CalculateValue(Slider.Value.Min + delta * (Slider.Value.Max - Slider.Value.Min))
                         
-                        if Value ~= LastValue then
+                        if Value ~= LastValue or ForceSet then
                             Tween(Slider.UIElements.SliderIcon.Frame, 0.05, {Size = UDim2.new(delta,0,1,0)}):Play()
                             Slider.UIElements.SliderContainer.TextBox.Text = FormatValue(Value)
                             if Tooltip then Tooltip.TitleFrame.Text = FormatValue(Value) end
@@ -285,7 +285,7 @@ function Element:New(Config)
                     local delta = math.clamp((Value - (Slider.Value.Min or 0)) / ((Slider.Value.Max or 100) - (Slider.Value.Min or 0)), 0, 1)
                     Value = CalculateValue(Slider.Value.Min + delta * (Slider.Value.Max - Slider.Value.Min))
                     
-                    if Value ~= LastValue then
+                    if Value ~= LastValue or ForceSet then
                         if Config.Window.IsRestoringConfig then
                             Slider.UIElements.SliderIcon.Frame.Size = UDim2.new(delta, 0, 1, 0)
                         else
