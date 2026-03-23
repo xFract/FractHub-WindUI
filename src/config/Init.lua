@@ -258,6 +258,8 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                 ConfigModule:Register(flag, element)
             end
         end
+
+        Window.PendingConfigData = Window.PendingConfigData or {}
         
         Window.IsRestoringConfig = true
 
@@ -285,6 +287,8 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                         task.wait()
                     end
                 end
+            else
+                Window.PendingConfigData[name] = data
             end
         end
 
@@ -351,10 +355,20 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                 local success, result = pcall(function()
                     return ConfigModule:Load()
                 end)
+
+                task.wait(1)
+                local retrySuccess, retryResult = pcall(function()
+                    return ConfigModule:Load()
+                end)
+
                 if success then
                     if Window.Debug then print("[ WindUI.ConfigManager ] AutoLoaded config: " .. configFilename) end
                 else
                     warn("[ WindUI.ConfigManager ] Failed to AutoLoad config: " .. configFilename .. " - " .. tostring(result))
+                end
+
+                if not retrySuccess then
+                    warn("[ WindUI.ConfigManager ] Retry AutoLoad failed: " .. configFilename .. " - " .. tostring(retryResult))
                 end
             end)
         end

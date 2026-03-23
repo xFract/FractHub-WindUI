@@ -4674,6 +4674,8 @@ ai:Register(am,an)
 end
 end
 
+ad.PendingConfigData=ad.PendingConfigData or{}
+
 ad.IsRestoringConfig=true
 
 local ao=0
@@ -4697,6 +4699,8 @@ if ao%1==0 then
 task.wait()
 end
 end
+else
+ad.PendingConfigData[am]=an
 end
 end
 
@@ -4760,10 +4764,17 @@ task.wait(0.5)
 local al,am=pcall(function()
 return ai:Load()
 end)
+task.wait(1)
+local an,ao=pcall(function()
+return ai:Load()
+end)
 if al then
 if ad.Debug then print("[ WindUI.ConfigManager ] AutoLoaded config: "..ag)end
 else
 warn("[ WindUI.ConfigManager ] Failed to AutoLoad config: "..ag.." - "..tostring(am))
+end
+if not an then
+warn("[ WindUI.ConfigManager ] Retry AutoLoad failed: "..ag.." - "..tostring(ao))
 end
 end)
 end
@@ -11333,6 +11344,7 @@ AllElements={},
 ElementConfig={},
 
 PendingFlags={},
+PendingConfigData={},
 
 IsToggleDragging=false,
 }
