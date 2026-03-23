@@ -168,8 +168,11 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 		end
 	end
 
-	local function Callback(customCallback)
+	local function Callback(customCallback, shouldCallback)
 		DropdownModule:Display()
+		if shouldCallback == false then
+			return
+		end
 		if Dropdown.Callback then
 			task.spawn(function()
 				Creator.SafeCallback(Dropdown.Callback, Dropdown.Value)
@@ -240,7 +243,7 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 		end
 	end
 
-	function DropdownModule:Refresh(Values)
+	function DropdownModule:Refresh(Values, shouldCallback)
 		for _, Elementt in next, Dropdown.UIElements.Menu.Frame.ScrollingFrame:GetChildren() do
 			if not Elementt:IsA("UIListLayout") then
 				Elementt:Destroy()
@@ -540,14 +543,14 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 			Dropdown.UIElements.MenuCanvas.Size.Y.Scale,
 			Dropdown.UIElements.MenuCanvas.Size.Y.Offset
 		)
-		Callback()
+		Callback(nil, shouldCallback)
 
 		Dropdown.Values = Values
 	end
 
-	DropdownModule:Refresh(Dropdown.Values)
+	DropdownModule:Refresh(Dropdown.Values, false)
 
-	function DropdownModule:Select(Items)
+	function DropdownModule:Select(Items, shouldCallback)
 		if Items then
 			Dropdown.Value = Items
 		else
@@ -557,7 +560,7 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 				Dropdown.Value = nil
 			end
 		end
-		DropdownModule:Refresh(Dropdown.Values)
+		DropdownModule:Refresh(Dropdown.Values, shouldCallback)
 	end
 
 	RecalculateListSize()

@@ -35,7 +35,7 @@ ConfigManager = {
             end,
             Load = function(element, data)
                 if element and element.Select then
-                    element:Select(data.value)
+                    element:Select(data.value, false)
                 end
             end
         },
@@ -48,7 +48,7 @@ ConfigManager = {
             end,
             Load = function(element, data)
                 if element and element.Set then
-                    element:Set(data.value)
+                    element:Set(data.value, false, false)
                 end
             end
         },
@@ -74,7 +74,7 @@ ConfigManager = {
             end,
             Load = function(element, data)
                 if element and element.Set then
-                    element:Set(tonumber(data.value))
+                    element:Set(tonumber(data.value), nil, false)
                 end
             end
         },
@@ -87,7 +87,7 @@ ConfigManager = {
             end,
             Load = function(element, data)
                 if element and element.Set then
-                    element:Set(data.value)
+                    element:Set(data.value, false, true)
                 end
             end
         },
@@ -234,14 +234,27 @@ function ConfigManager:CreateConfig(configFilename, autoload)
             end
         end
         
+        Window.IsRestoringConfig = true
+
+        local appliedCount = 0
         for name, data in next, (loadData.__elements or {}) do
             if ConfigModule.Elements[name] and ConfigManager.Parser[data.__type] then
-                task.spawn(function()
+                local success, err = pcall(function()
                     ConfigManager.Parser[data.__type].Load(ConfigModule.Elements[name], data)
                 end)
+
+                if not success then
+                    warn("[ WindUI.ConfigManager ] Failed to load element '" .. tostring(name) .. "': " .. tostring(err))
+                else
+                    appliedCount += 1
+                    if appliedCount % 10 == 0 then
+                        task.wait()
+                    end
+                end
             end
         end
-        
+
+        Window.IsRestoringConfig = false
         ConfigModule.CustomData = loadData.__custom or {}
         
         return ConfigModule.CustomData

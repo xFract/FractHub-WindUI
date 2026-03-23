@@ -82,10 +82,12 @@ function Element:New(Config)
     end
     
     
-    function Input:Set(v, IsUserInput)
+    function Input:Set(v, IsUserInput, ShouldCallback)
         if CanCallback then
             Input.Value = v
-            Creator.SafeCallback(Input.Callback, v)
+            if ShouldCallback ~= false then
+                Creator.SafeCallback(Input.Callback, v)
+            end
             
             if not IsUserInput then
                 InputComponent.Frame.Frame.TextBox.Text = v

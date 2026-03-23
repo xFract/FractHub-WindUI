@@ -224,7 +224,7 @@ function Element:New(Config)
     --local ScrollingFrameParent = Slider.SliderFrame.Parent:IsA("ScrollingFrame") and Slider.SliderFrame.Parent or Slider.SliderFrame.Parent.Parent.Parent
     local ScrollingFrameParent = Config.Tab.UIElements.ContainerFrame
     
-    function Slider:Set(Value, input)
+    function Slider:Set(Value, input, ShouldCallback)
         if CanCallback then
             if not Slider.IsFocusing and not IsSliderHolding and (not input or (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch)) then
                 if input then
@@ -243,7 +243,9 @@ function Element:New(Config)
                         if Tooltip then Tooltip.TitleFrame.Text = FormatValue(Value) end
                         Slider.Value.Default = FormatValue(Value)
                         LastValue = Value
-                        Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                        if ShouldCallback ~= false then
+                            Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                        end
                     end
                     
                     moveconnection = RunService.RenderStepped:Connect(function()
@@ -257,7 +259,9 @@ function Element:New(Config)
                             if Tooltip then Tooltip.TitleFrame.Text = FormatValue(Value) end
                             Slider.Value.Default = FormatValue(Value)
                             LastValue = Value
-                            Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                            if ShouldCallback ~= false then
+                                Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                            end
                         end
                     end)
                     
@@ -282,18 +286,23 @@ function Element:New(Config)
                     Value = CalculateValue(Slider.Value.Min + delta * (Slider.Value.Max - Slider.Value.Min))
                     
                     if Value ~= LastValue then
-                        Tween(Slider.UIElements.SliderIcon.Frame, 0.05, {Size = UDim2.new(delta,0,1,0)}):Play()
+                        if Config.Window.IsRestoringConfig then
+                            Slider.UIElements.SliderIcon.Frame.Size = UDim2.new(delta, 0, 1, 0)
+                        else
+                            Tween(Slider.UIElements.SliderIcon.Frame, 0.05, {Size = UDim2.new(delta,0,1,0)}):Play()
+                        end
                         Slider.UIElements.SliderContainer.TextBox.Text = FormatValue(Value)
                         if Tooltip then Tooltip.TitleFrame.Text = FormatValue(Value) end
                         Slider.Value.Default = FormatValue(Value)
                         LastValue = Value
-                        Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                        if ShouldCallback ~= false then
+                            Creator.SafeCallback(Slider.Callback, FormatValue(Value))
+                        end
                     end
                 end
             end
         end
     end
-    
     function Slider:SetMax(newMax)
         Slider.Value.Max = newMax
         

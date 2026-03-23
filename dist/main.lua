@@ -507,6 +507,10 @@ if not r then
 return
 end
 
+if m and m.Window and m.Window.IsRestoringConfig then
+return
+end
+
 local u,v=pcall(r,...)
 if not u then
 if m and m.Window and m.Window.Debug then local
@@ -4645,14 +4649,26 @@ ai:Register(am,an)
 end
 end
 
+ad.IsRestoringConfig=true
+
+local ao=0
 for am,an in next,(al.__elements or{})do
 if ai.Elements[am]and ae.Parser[an.__type]then
-task.spawn(function()
+local ap,aq=pcall(function()
 ae.Parser[an.__type].Load(ai.Elements[am],an)
 end)
+if not ap then
+warn("[ WindUI.ConfigManager ] Failed to load element '"..tostring(am).."': "..tostring(aq))
+else
+ao+=1
+if ao%10==0 then
+task.wait()
+end
+end
 end
 end
 
+ad.IsRestoringConfig=false
 ai.CustomData=al.__custom or{}
 
 return ai.CustomData

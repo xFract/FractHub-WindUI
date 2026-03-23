@@ -151,6 +151,10 @@ function Creator.SafeCallback(Function, ...)
 		return
 	end
 
+	if WindUI and WindUI.Window and WindUI.Window.IsRestoringConfig then
+		return
+	end
+
 	local Success, Event = pcall(Function, ...)
 	if not Success then
 		if WindUI and WindUI.Window and WindUI.Window.Debug then
