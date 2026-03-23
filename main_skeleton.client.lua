@@ -6,6 +6,7 @@ end
 
 local WindUI = get("dist/main.lua")
 local ConfigAddon = get("Addons/ConfigManager.lua")
+local InterfaceAddon = get("Addons/InterfaceManager.lua")
 local Maid = get("Addons/Maid.lua")
 
 if getgenv().Script_Maid then
@@ -55,6 +56,10 @@ end)
 ConfigAddon:SetLibrary(WindUI)
 ConfigAddon:SetWindow(Window)
 ConfigAddon:SetDefaultConfigName("default")
+
+InterfaceAddon:SetLibrary(WindUI)
+InterfaceAddon:SetWindow(Window)
+InterfaceAddon:SetFolder("WindUI/" .. FOLDER_NAME)
 
 local MainSection = Window:Section({
 	Title = "Main Section",
@@ -303,31 +308,7 @@ local ConfigTab = UtilitySection:Tab({
 	Icon = "save",
 })
 
-SettingsTab:Section({
-	Title = "Theme",
-	Desc = "Basic theme switcher.",
-})
-
-SettingsTab:Dropdown({
-	Title = "Select Theme",
-	Value = "Dark",
-	Values = { "Dark", "Light" },
-	Callback = function(theme)
-		WindUI:SetTheme(theme)
-	end,
-})
-
-SettingsTab:Space()
-
-SettingsTab:Toggle({
-	Title = "Window Transparency",
-	Value = false,
-	Callback = function(state)
-		Window:ToggleTransparency(state)
-	end,
-})
-
-SettingsTab:Space()
+InterfaceAddon:BuildInterfaceSection(SettingsTab)
 
 SettingsTab:Button({
 	Title = "Destroy UI",
