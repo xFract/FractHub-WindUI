@@ -51,6 +51,10 @@ local Window = WindUI:CreateWindow({
 	SidebarLogo = "rbxassetid://92450040427767",
 	MinimizeIcon = "rbxassetid://73404955622861",
 	SidebarLogoHeight = 120,
+	OpenButton = {
+	BackgroundTransparency = 1,
+	StrokeThickness = 0,
+}
 })
 
 local MainSection = Window:Section({

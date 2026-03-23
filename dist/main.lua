@@ -4806,26 +4806,21 @@ function aa.New(af)
 local ag={
 Button=nil
 }
+local ah=.2
 
-local ah
+local function ai()
+if ah>=1 then
+return 1
+end
 
+return math.max(0,ah-.15)
+end
 
-
-
-
-
-
-
-
-
-
-
-
-local ai=ac("UIScale",{
+local aj=ac("UIScale",{
 Scale=1,
 })
 
-local aj=ac("ImageLabel",{
+local ak=ac("ImageLabel",{
 Name="Icon",
 BackgroundTransparency=1,
 AnchorPoint=Vector2.new(0.5,0.5),
@@ -4835,7 +4830,7 @@ ScaleType="Fit",
 ImageTransparency=0,
 })
 
-local ak=ac("ImageButton",{
+local al=ac("ImageButton",{
 Name="OpenButton",
 Size=UDim2.new(0,44,0,44),
 Position=UDim2.new(0.5,0,0,28),
@@ -4849,7 +4844,7 @@ Visible=false,
 ZIndex=99,
 Active=true,
 },{
-ai,
+aj,
 ac("UICorner",{
 CornerRadius=UDim.new(0,14)
 }),
@@ -4863,84 +4858,85 @@ ac("UIGradient",{
 Color=ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff")
 })
 }),
-aj,
+ak,
 })
 
-local al=ab.Drag(ak,{ak})
+local am=ab.Drag(al,{al})
 
-ag.Button=ak
+ag.Button=al
 
-function ag.SetIcon(am,an)
-aj.Image=an or""
-aj.Visible=an~=nil and an~=""
+function ag.SetIcon(an,ao)
+ak.Image=ao or""
+ak.Visible=ao~=nil and ao~=""
 end
 
 if af.MinimizeIcon or af.Icon then
 ag:SetIcon(af.MinimizeIcon or af.Icon)
 end
 
-ab.AddSignal(ak.MouseEnter,function()
-ad(ak,.1,{BackgroundTransparency=.05}):Play()
+ab.AddSignal(al.MouseEnter,function()
+ad(al,.1,{BackgroundTransparency=ai()}):Play()
 end)
-ab.AddSignal(ak.MouseLeave,function()
-ad(ak,.1,{BackgroundTransparency=.2}):Play()
+ab.AddSignal(al.MouseLeave,function()
+ad(al,.1,{BackgroundTransparency=ah}):Play()
 end)
 
-function ag.Visible(am,an)
-ak.Visible=an
+function ag.Visible(an,ao)
+al.Visible=ao
 end
 
-function ag.SetScale(am,an)
-ai.Scale=an
+function ag.SetScale(an,ao)
+aj.Scale=ao
 end
 
-function ag.Edit(am,an)
-local ao={
-Title=an.Title,
-Icon=an.Icon,
-Enabled=an.Enabled,
-Position=an.Position,
-Draggable=an.Draggable,
-OnlyMobile=an.OnlyMobile,
-CornerRadius=an.CornerRadius or UDim.new(0,14),
-StrokeThickness=an.StrokeThickness or 0,
-Scale=an.Scale or 1,
-Color=an.Color or ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff"),
-Size=an.Size or UDim2.fromOffset(44,44),
-IconSize=an.IconSize or UDim2.fromOffset(36,36),
-BackgroundTransparency=an.BackgroundTransparency,
+function ag.Edit(an,ao)
+local ap={
+Title=ao.Title,
+Icon=ao.Icon,
+Enabled=ao.Enabled,
+Position=ao.Position,
+Draggable=ao.Draggable,
+OnlyMobile=ao.OnlyMobile,
+CornerRadius=ao.CornerRadius or UDim.new(0,14),
+StrokeThickness=ao.StrokeThickness or 0,
+Scale=ao.Scale or 1,
+Color=ao.Color or ColorSequence.new(Color3.fromHex"40c9ff",Color3.fromHex"e81cff"),
+Size=ao.Size or UDim2.fromOffset(44,44),
+IconSize=ao.IconSize or UDim2.fromOffset(36,36),
+BackgroundTransparency=ao.BackgroundTransparency,
 }
 
-if ao.Enabled==false then
+if ap.Enabled==false then
 af.IsOpenButtonEnabled=false
 end
 
-if ao.OnlyMobile~=false then
-ao.OnlyMobile=true
+if ap.OnlyMobile~=false then
+ap.OnlyMobile=true
 else
 af.IsPC=false
 end
 
-if ao.Position then
-ak.Position=ao.Position
+if ap.Position then
+al.Position=ap.Position
 end
 
-ak.Size=ao.Size
-aj.Size=ao.IconSize
-ak.UICorner.CornerRadius=ao.CornerRadius
-ak.UIStroke.Thickness=ao.StrokeThickness
-ak.UIStroke.UIGradient.Color=ao.Color
-ak.BackgroundTransparency=ao.BackgroundTransparency or 0.2
+al.Size=ap.Size
+ak.Size=ap.IconSize
+al.UICorner.CornerRadius=ap.CornerRadius
+al.UIStroke.Thickness=ap.StrokeThickness
+al.UIStroke.UIGradient.Color=ap.Color
+ah=ap.BackgroundTransparency or ah or .2
+al.BackgroundTransparency=ah
 
-if ao.Icon then
-ag:SetIcon(ao.Icon)
+if ap.Icon then
+ag:SetIcon(ap.Icon)
 end
 
-if al then
-al:Set(ao.Draggable~=false)
+if am then
+am:Set(ap.Draggable~=false)
 end
 
-ag:SetScale(ao.Scale)
+ag:SetScale(ap.Scale)
 end
 
 return ag

@@ -8,6 +8,15 @@ function OpenButton.New(Window)
 	local OpenButtonMain = {
 		Button = nil,
 	}
+	local baseBackgroundTransparency = 0.2
+
+	local function getHoverBackgroundTransparency()
+		if baseBackgroundTransparency >= 1 then
+			return 1
+		end
+
+		return math.max(0, baseBackgroundTransparency - 0.15)
+	end
 
 	local UIScale = New("UIScale", {
 		Scale = 1,
@@ -68,11 +77,11 @@ function OpenButton.New(Window)
 	end
 
 	Creator.AddSignal(Button.MouseEnter, function()
-		Tween(Button, 0.1, { BackgroundTransparency = 0.05 }):Play()
+		Tween(Button, 0.1, { BackgroundTransparency = getHoverBackgroundTransparency() }):Play()
 	end)
 
 	Creator.AddSignal(Button.MouseLeave, function()
-		Tween(Button, 0.1, { BackgroundTransparency = 0.2 }):Play()
+		Tween(Button, 0.1, { BackgroundTransparency = baseBackgroundTransparency }):Play()
 	end)
 
 	function OpenButtonMain:Visible(v)
@@ -119,7 +128,10 @@ function OpenButton.New(Window)
 		Button.UICorner.CornerRadius = OpenButtonModule.CornerRadius
 		Button.UIStroke.Thickness = OpenButtonModule.StrokeThickness
 		Button.UIStroke.UIGradient.Color = OpenButtonModule.Color
-		Button.BackgroundTransparency = OpenButtonModule.BackgroundTransparency or 0.2
+		baseBackgroundTransparency = OpenButtonModule.BackgroundTransparency
+			or baseBackgroundTransparency
+			or 0.2
+		Button.BackgroundTransparency = baseBackgroundTransparency
 
 		if OpenButtonModule.Icon then
 			OpenButtonMain:SetIcon(OpenButtonModule.Icon)
