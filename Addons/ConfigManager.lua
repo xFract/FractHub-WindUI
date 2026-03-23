@@ -1,6 +1,8 @@
 local ConfigAddon = {}
 ConfigAddon.__index = ConfigAddon
 
+local HttpService = game:GetService("HttpService")
+
 ConfigAddon.Folder = "WindUI"
 ConfigAddon.DefaultConfigName = "default"
 ConfigAddon.AutoLoad = true
@@ -28,6 +30,34 @@ function ConfigAddon:GetConfigNames()
 	local names = self.ConfigManager:AllConfigs()
 	table.sort(names)
 	return names
+end
+
+function ConfigAddon:GetAutoLoadConfigName()
+	if not self.ConfigManager or not self.ConfigManager.Path or not listfiles or not readfile then
+		return nil
+	end
+
+	local success, files = pcall(function()
+		return listfiles(self.ConfigManager.Path)
+	end)
+
+	if not success or not files then
+		return nil
+	end
+
+	for _, file in ipairs(files) do
+		if file:match("%.json$") then
+			local readSuccess, decoded = pcall(function()
+				return HttpService:JSONDecode(readfile(file))
+			end)
+
+			if readSuccess and decoded and decoded.__autoload then
+				return file:match("([^\\/]+)%.json$")
+			end
+		end
+	end
+
+	return nil
 end
 
 function ConfigAddon:EnsureConfig(configName, autoload)
@@ -69,7 +99,7 @@ function ConfigAddon:BuildConfigSection(tab, options)
 
 	options = options or {}
 	self.AutoLoad = options.AutoLoad ~= false
-	self.DefaultConfigName = options.DefaultConfigName or self.DefaultConfigName
+	self.DefaultConfigName = self:GetAutoLoadConfigName() or options.DefaultConfigName or self.DefaultConfigName
 
 	if self.ConfigManager then
 		self:EnsureConfig(self.DefaultConfigName, self.AutoLoad)
