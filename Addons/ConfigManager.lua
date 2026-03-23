@@ -112,12 +112,6 @@ function ConfigAddon:BuildConfigSection(tab, options)
 			end
 
 			self.DefaultConfigName = value
-			self:EnsureConfig(self.DefaultConfigName, self.AutoLoad)
-
-			if configDropdown and configDropdown.Refresh then
-				configDropdown:Refresh(self:GetConfigNames())
-				configDropdown:Select(self.DefaultConfigName)
-			end
 		end,
 	})
 
@@ -131,6 +125,32 @@ function ConfigAddon:BuildConfigSection(tab, options)
 			if self.CurrentConfig then
 				self.CurrentConfig:SetAutoLoad(state)
 			end
+		end,
+	})
+
+	tab:Space()
+
+	tab:Button({
+		Title = options.CreateTitle or "Create Config",
+		Callback = function()
+			if not self.ConfigManager then
+				self:Notify("Config", "ConfigManager is not available here.", "triangle-alert")
+				return
+			end
+
+			local config = self:EnsureConfig(self.DefaultConfigName, self.AutoLoad)
+			local success, result = config:Save()
+			if success == false then
+				self:Notify("Create Failed", tostring(result), "triangle-alert")
+				return
+			end
+
+			if configDropdown and configDropdown.Refresh then
+				configDropdown:Refresh(self:GetConfigNames())
+				configDropdown:Select(self.DefaultConfigName)
+			end
+
+			self:Notify("Config Created", self.DefaultConfigName, "file-plus")
 		end,
 	})
 

@@ -1,6 +1,6 @@
-WindUI 使える要素メモ
+WindUI 使える要素一覧
 
-基本の流れ
+基本
 local Window = WindUI:CreateWindow({
 	Title = "My UI",
 	Theme = "Dark",
@@ -10,48 +10,42 @@ local Window = WindUI:CreateWindow({
 local MainSection = Window:Section({ Title = "Main Section" })
 local MainTab = MainSection:Tab({ Title = "Main", Icon = "home" })
 
-サイドバー系
+Window で使うもの
 Window:Section({ Title = "Section Name" })
-サイドバーのグループを作る。
+サイドバー内のグループを作る。
 
 Window:Tab({ Title = "Main", Icon = "home" })
 サイドバーに直接タブを作る。
 
 Section:Tab({ Title = "Main", Icon = "home" })
-サイドバーグループの中にタブを作る。
+Section の中にタブを作る。
 
 Window:SelectTab(1)
-番号またはタブオブジェクトでタブを選ぶ。
+番号またはタブを指定して選択する。
 
 MainTab:Select()
 そのタブを開く。
 
 Window:AddSettings()
-テーマ変更つきの設定タブを追加する。
+設定タブを自動追加する。
 
 Window:SetSidebarLogo("rbxassetid://...")
 サイドバー上部ロゴを変更する。
 
 Window:EditOpenButton({ BackgroundTransparency = 1 })
-最小化後のアイコン見た目を変更する。
+最小化後のボタン見た目を変更する。
 
 タブ内で使える要素
-MainTab:Section({
-	Title = "Farm Settings",
-	Desc = "説明",
-	Box = true,
-	Opened = true,
-})
-タブ内の見出しセクション。中に要素を追加できる。
 
+Button
 MainTab:Button({
 	Title = "Notify",
 	Callback = function()
 		print("clicked")
 	end,
 })
-普通のボタン。
 
+Toggle
 MainTab:Toggle({
 	Title = "Auto Farm",
 	Value = false,
@@ -59,8 +53,8 @@ MainTab:Toggle({
 		print(state)
 	end,
 })
-オンオフ切替。
 
+Slider
 MainTab:Slider({
 	Title = "Distance",
 	Step = 1,
@@ -69,8 +63,8 @@ MainTab:Slider({
 		print(value)
 	end,
 })
-数値スライダー。
 
+Input
 MainTab:Input({
 	Title = "Player Name",
 	Placeholder = "Type here...",
@@ -78,8 +72,8 @@ MainTab:Input({
 		print(value)
 	end,
 })
-文字入力。
 
+Dropdown
 MainTab:Dropdown({
 	Title = "Position",
 	Value = "Above",
@@ -88,7 +82,9 @@ MainTab:Dropdown({
 		print(value)
 	end,
 })
-Multi = true で複数選択もできる。
+単一選択。Refresh / Select も使える。
+
+Multi Dropdown
 MainTab:Dropdown({
 	Title = "Select Items",
 	Value = {},
@@ -101,8 +97,9 @@ MainTab:Dropdown({
 		end
 	end,
 })
-ドロップダウン。Refresh / Select も使える。
+複数選択。Multi = true と Value = {} を使う。
 
+Keybind
 MainTab:Keybind({
 	Title = "Toggle Key",
 	Value = "RightShift",
@@ -110,8 +107,8 @@ MainTab:Keybind({
 		print(key)
 	end,
 })
-キー設定。
 
+Colorpicker
 MainTab:Colorpicker({
 	Title = "Theme Color",
 	Default = Color3.fromRGB(0, 170, 255),
@@ -119,42 +116,39 @@ MainTab:Colorpicker({
 		print(color)
 	end,
 })
-色選択。
 
+Paragraph
 MainTab:Paragraph({
 	Title = "Info",
-	Desc = "説明文を書ける",
+	Desc = "説明文を置ける",
 	Image = "info",
 })
-説明文ブロック。
 
+Divider
 MainTab:Divider()
-区切り線。
 
+Space
 MainTab:Space()
-余白。
 
+Image
 MainTab:Image({
 	Title = "Preview",
 	Image = "rbxassetid://123456",
 })
-画像表示。
 
+Code
 MainTab:Code({
 	Title = "Example",
 	Code = "print('hello')",
 })
-コード表示。
 
-MainTab:Group()
-グループを作る。戻り値に対して Button / Toggle などを追加できる。
-
-Group の使い方
+Group
 local Group = MainTab:Group()
 Group:Button({ Title = "Test", Callback = function() end })
 Group:Toggle({ Title = "Enabled", Value = true, Callback = function(v) end })
+横並び用。中に Button / Toggle などを置ける。
 
-タブ内セクションの使い方
+Section
 local FarmSection = MainTab:Section({
 	Title = "Farm Settings",
 	Desc = "Section inside tab",
@@ -166,10 +160,11 @@ local FarmSection = MainTab:Section({
 FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })
 FarmSection:Dropdown({ Title = "Position", Value = "Above", Values = { "Above", "Below" }, Callback = function(v) end })
 FarmSection:Slider({ Title = "Distance", Step = 1, Value = { Min = 0, Max = 50, Default = 15 }, Callback = function(v) end })
+タブ内の枠付きセクション。
 
 コンフィグ保存
 対応要素は Toggle / Slider / Input / Dropdown / Keybind / Colorpicker。
-保存したい要素には Flag を付ける。
+保存したい要素に Flag を付ける。
 
 MainTab:Toggle({
 	Title = "Auto Farm",
@@ -186,27 +181,23 @@ MainTab:Dropdown({
 	Callback = function(v) end,
 })
 
-コンフィグ作成
 local Config = Window.ConfigManager:Config("default", true)
-
-保存
 Config:Save()
-
-読込
 Config:Load()
-
-自動読込の切替
 Config:SetAutoLoad(true)
 
-カスタム値の保存
+カスタム値も保存できる。
 Config:Set("selected_world", "World1")
 local world = Config:Get("selected_world")
 
 補足
-Folder を指定しないとコンフィグ機能は使えない。
+Folder を指定しないとコンフィグ保存は使えない。
 保存先は WindUI/<Folder>/config/*.json。
-Studio ではコンフィグ機能は動かない。
-多くの要素は SetTitle / SetDesc / Destroy を使える。
-Dropdown は Refresh / Select を使える。
-Window 生成時に Settings = true または Settings = { ... } を渡しても設定タブを作れる。
-Video.lua は存在するが、現状の公開ロード対象には入っていない。
+Studio ではコンフィグ保存は動かない。
+
+ロック対応
+Button / Toggle / Slider / Input / Dropdown / Keybind / Colorpicker は Locked と LockedTitle を使える。
+作成後は :Lock() / :Unlock() も使える。
+
+使えないもの
+Video.lua はファイル自体はあるが、現在の src/elements/Init.lua ではコメントアウトされているため今は使えない。
