@@ -1,33 +1,4 @@
---[[
-    WindUI executor skeleton sample
-
-    Minimal structure:
-    - load WindUI
-    - create window
-    - create tabs
-    - create a few basic controls
-]]
-
 local function loadWindUI()
-	local localPaths = {
-		"dist/main.lua",
-		"FractHub-WindUI/dist/main.lua",
-	}
-
-	if readfile and loadstring then
-		for _, path in ipairs(localPaths) do
-			if isfile and isfile(path) then
-				local ok, result = pcall(function()
-					return loadstring(readfile(path))()
-				end)
-
-				if ok and result then
-					return result
-				end
-			end
-		end
-	end
-
 	local ok, result = pcall(function()
 		return loadstring(game:HttpGet("https://raw.githubusercontent.com/xFract/FractHub-WindUI/refs/heads/main/dist/main.lua"))()
 	end)
@@ -39,7 +10,70 @@ local function loadWindUI()
 	error("Failed to load WindUI")
 end
 
+local function loadConfigAddon()
+	local ok, result = pcall(function()
+		return loadstring(
+			game:HttpGet("https://raw.githubusercontent.com/xFract/FractHub-WindUI/refs/heads/main/Addons/ConfigManager.lua")
+		)()
+	end)
+
+	if ok and result then
+		return result
+	end
+
+	error("Failed to load Config addon")
+end
+
 local WindUI = loadWindUI()
+local ConfigAddon = loadConfigAddon()
+
+if getgenv().Script_Maid then
+	pcall(function()
+		getgenv().Script_Maid:Destroy()
+	end)
+end
+
+local Maid = {}
+Maid.__index = Maid
+
+function Maid.new()
+	return setmetatable({
+		_tasks = {},
+	}, Maid)
+end
+
+function Maid:GiveTask(task)
+	if not task then
+		error("Task cannot be false or nil", 2)
+	end
+
+	local taskId = #self._tasks + 1
+	self._tasks[taskId] = task
+	return taskId
+end
+
+function Maid:DoCleaning()
+	local tasks = self._tasks
+	for index, task in pairs(tasks) do
+		if typeof(task) == "RBXScriptConnection" then
+			task:Disconnect()
+		elseif type(task) == "function" then
+			task()
+		elseif typeof(task) == "Instance" then
+			task:Destroy()
+		elseif type(task) == "table" and type(task.Destroy) == "function" then
+			task:Destroy()
+		elseif type(task) == "table" and type(task.DoCleaning) == "function" then
+			task:DoCleaning()
+		end
+
+		tasks[index] = nil
+	end
+end
+
+function Maid:Destroy()
+	self:DoCleaning()
+end
 
 local Window = WindUI:CreateWindow({
 	Title = "WindUI Skeleton",
@@ -49,13 +83,39 @@ local Window = WindUI:CreateWindow({
 	Theme = "Dark",
 	ToggleKey = Enum.KeyCode.RightShift,
 	SidebarLogo = "rbxassetid://92450040427767",
-	MinimizeIcon = "rbxassetid://73404955622861",
+	MinimizeIcon = "rbxassetid://133420557505582",
 	SidebarLogoHeight = 120,
 	OpenButton = {
-	BackgroundTransparency = 1,
-	StrokeThickness = 0,
-}
+		BackgroundTransparency = 1,
+		StrokeThickness = 0,
+		IconSize = UDim2.fromOffset(42, 42),
+	},
 })
+
+local scriptMaid = Maid.new()
+getgenv().Script_Maid = scriptMaid
+scriptMaid:GiveTask(function()
+	pcall(function()
+		if Window then
+			Window:Destroy()
+		end
+	end)
+end)
+
+local FOLDER_NAME = "WindUI_Skeleton"
+getgenv().Script_FolderName = FOLDER_NAME
+pcall(function()
+	if not isfolder("WindUI") then
+		makefolder("WindUI")
+	end
+	if not isfolder("WindUI/" .. FOLDER_NAME) then
+		makefolder("WindUI/" .. FOLDER_NAME)
+	end
+end)
+
+ConfigAddon:SetLibrary(WindUI)
+ConfigAddon:SetWindow(Window)
+ConfigAddon:SetDefaultConfigName("default")
 
 local MainSection = Window:Section({
 	Title = "Main Section",
@@ -89,6 +149,7 @@ MainTab:Space()
 
 MainTab:Toggle({
 	Title = "Example Toggle",
+	Flag = "example_toggle",
 	Value = false,
 	Callback = function(state)
 		print("Toggle:", state)
@@ -99,6 +160,7 @@ MainTab:Space()
 
 MainTab:Input({
 	Title = "Example Input",
+	Flag = "example_input",
 	Placeholder = "Type here...",
 	Callback = function(value)
 		print("Input:", value)
@@ -109,6 +171,7 @@ MainTab:Space()
 
 MainTab:Slider({
 	Title = "Example Slider",
+	Flag = "example_slider",
 	Step = 1,
 	Value = {
 		Min = 0,
@@ -124,6 +187,7 @@ MainTab:Space()
 
 MainTab:Dropdown({
 	Title = "Example Dropdown",
+	Flag = "example_dropdown",
 	Value = "Option 1",
 	Values = { "Option 1", "Option 2", "Option 3" },
 	Callback = function(value)
@@ -135,6 +199,7 @@ MainTab:Space()
 
 MainTab:Colorpicker({
 	Title = "Example Colorpicker",
+	Flag = "example_colorpicker",
 	Default = Color3.fromRGB(0, 170, 255),
 	Callback = function(color)
 		print("Color:", color)
@@ -145,6 +210,7 @@ MainTab:Space()
 
 MainTab:Keybind({
 	Title = "UI Toggle Key",
+	Flag = "ui_toggle_key",
 	Value = "RightShift",
 	Callback = function(key)
 		local keyCode = Enum.KeyCode[key]
@@ -166,6 +232,7 @@ local FarmSection = MainTab:Section({
 
 FarmSection:Toggle({
 	Title = "Auto Farm",
+	Flag = "auto_farm",
 	Value = false,
 	Callback = function(state)
 		print("Auto Farm:", state)
@@ -176,6 +243,7 @@ FarmSection:Space()
 
 FarmSection:Dropdown({
 	Title = "Position",
+	Flag = "farm_position",
 	Value = "Above",
 	Values = { "Above", "Below", "Behind" },
 	Callback = function(value)
@@ -187,6 +255,7 @@ FarmSection:Space()
 
 FarmSection:Slider({
 	Title = "Damage Increment",
+	Flag = "damage_increment",
 	Step = 1,
 	Value = {
 		Min = 0,
@@ -210,6 +279,7 @@ local LootSection = MainTab:Section({
 
 LootSection:Toggle({
 	Title = "Auto Loot Chests",
+	Flag = "auto_loot_chests",
 	Value = true,
 	Callback = function(state)
 		print("Auto Loot Chests:", state)
@@ -220,6 +290,7 @@ LootSection:Space()
 
 LootSection:Toggle({
 	Title = "Auto Loot Drops",
+	Flag = "auto_loot_drops",
 	Value = true,
 	Callback = function(state)
 		print("Auto Loot Drops:", state)
@@ -288,6 +359,11 @@ local SettingsTab = UtilitySection:Tab({
 	Icon = "settings",
 })
 
+local ConfigTab = UtilitySection:Tab({
+	Title = "Config",
+	Icon = "save",
+})
+
 SettingsTab:Section({
 	Title = "Theme",
 	Desc = "Basic theme switcher.",
@@ -317,8 +393,15 @@ SettingsTab:Space()
 SettingsTab:Button({
 	Title = "Destroy UI",
 	Callback = function()
-		Window:Destroy()
+		scriptMaid:Destroy()
 	end,
+})
+
+ConfigAddon:BuildConfigSection(ConfigTab, {
+	SectionTitle = "Config Save",
+	SectionDesc = "Save and restore Flag-based values. Works outside Studio.",
+	DefaultConfigName = "default",
+	AutoLoad = true,
 })
 
 local AboutTab = UtilitySection:Tab({

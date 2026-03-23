@@ -1,0 +1,199 @@
+WindUI 使える要素メモ
+
+基本の流れ
+local Window = WindUI:CreateWindow({
+	Title = "My UI",
+	Theme = "Dark",
+	Folder = "MyScript",
+})
+
+local MainSection = Window:Section({ Title = "Main Section" })
+local MainTab = MainSection:Tab({ Title = "Main", Icon = "home" })
+
+サイドバー系
+Window:Section({ Title = "Section Name" })
+サイドバーのグループを作る。
+
+Window:Tab({ Title = "Main", Icon = "home" })
+サイドバーに直接タブを作る。
+
+Section:Tab({ Title = "Main", Icon = "home" })
+サイドバーグループの中にタブを作る。
+
+Window:SelectTab(1)
+番号またはタブオブジェクトでタブを選ぶ。
+
+MainTab:Select()
+そのタブを開く。
+
+Window:AddSettings()
+テーマ変更つきの設定タブを追加する。
+
+Window:SetSidebarLogo("rbxassetid://...")
+サイドバー上部ロゴを変更する。
+
+Window:EditOpenButton({ BackgroundTransparency = 1 })
+最小化後のアイコン見た目を変更する。
+
+タブ内で使える要素
+MainTab:Section({
+	Title = "Farm Settings",
+	Desc = "説明",
+	Box = true,
+	Opened = true,
+})
+タブ内の見出しセクション。中に要素を追加できる。
+
+MainTab:Button({
+	Title = "Notify",
+	Callback = function()
+		print("clicked")
+	end,
+})
+普通のボタン。
+
+MainTab:Toggle({
+	Title = "Auto Farm",
+	Value = false,
+	Callback = function(state)
+		print(state)
+	end,
+})
+オンオフ切替。
+
+MainTab:Slider({
+	Title = "Distance",
+	Step = 1,
+	Value = { Min = 0, Max = 50, Default = 15 },
+	Callback = function(value)
+		print(value)
+	end,
+})
+数値スライダー。
+
+MainTab:Input({
+	Title = "Player Name",
+	Placeholder = "Type here...",
+	Callback = function(value)
+		print(value)
+	end,
+})
+文字入力。
+
+MainTab:Dropdown({
+	Title = "Position",
+	Value = "Above",
+	Values = { "Above", "Below", "Behind" },
+	Callback = function(value)
+		print(value)
+	end,
+})
+ドロップダウン。Refresh / Select も使える。
+
+MainTab:Keybind({
+	Title = "Toggle Key",
+	Value = "RightShift",
+	Callback = function(key)
+		print(key)
+	end,
+})
+キー設定。
+
+MainTab:Colorpicker({
+	Title = "Theme Color",
+	Default = Color3.fromRGB(0, 170, 255),
+	Callback = function(color)
+		print(color)
+	end,
+})
+色選択。
+
+MainTab:Paragraph({
+	Title = "Info",
+	Desc = "説明文を書ける",
+	Image = "info",
+})
+説明文ブロック。
+
+MainTab:Divider()
+区切り線。
+
+MainTab:Space()
+余白。
+
+MainTab:Image({
+	Title = "Preview",
+	Image = "rbxassetid://123456",
+})
+画像表示。
+
+MainTab:Code({
+	Title = "Example",
+	Code = "print('hello')",
+})
+コード表示。
+
+MainTab:Group()
+グループを作る。戻り値に対して Button / Toggle などを追加できる。
+
+Group の使い方
+local Group = MainTab:Group()
+Group:Button({ Title = "Test", Callback = function() end })
+Group:Toggle({ Title = "Enabled", Value = true, Callback = function(v) end })
+
+タブ内セクションの使い方
+local FarmSection = MainTab:Section({
+	Title = "Farm Settings",
+	Desc = "Section inside tab",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })
+FarmSection:Dropdown({ Title = "Position", Value = "Above", Values = { "Above", "Below" }, Callback = function(v) end })
+FarmSection:Slider({ Title = "Distance", Step = 1, Value = { Min = 0, Max = 50, Default = 15 }, Callback = function(v) end })
+
+コンフィグ保存
+対応要素は Toggle / Slider / Input / Dropdown / Keybind / Colorpicker。
+保存したい要素には Flag を付ける。
+
+MainTab:Toggle({
+	Title = "Auto Farm",
+	Flag = "auto_farm",
+	Value = false,
+	Callback = function(v) end,
+})
+
+MainTab:Dropdown({
+	Title = "Position",
+	Flag = "farm_position",
+	Value = "Above",
+	Values = { "Above", "Below", "Behind" },
+	Callback = function(v) end,
+})
+
+コンフィグ作成
+local Config = Window.ConfigManager:Config("default", true)
+
+保存
+Config:Save()
+
+読込
+Config:Load()
+
+自動読込の切替
+Config:SetAutoLoad(true)
+
+カスタム値の保存
+Config:Set("selected_world", "World1")
+local world = Config:Get("selected_world")
+
+補足
+Folder を指定しないとコンフィグ機能は使えない。
+保存先は WindUI/<Folder>/config/*.json。
+Studio ではコンフィグ機能は動かない。
+多くの要素は SetTitle / SetDesc / Destroy を使える。
+Dropdown は Refresh / Select を使える。
+Window 生成時に Settings = true または Settings = { ... } を渡しても設定タブを作れる。
+Video.lua は存在するが、現状の公開ロード対象には入っていない。
