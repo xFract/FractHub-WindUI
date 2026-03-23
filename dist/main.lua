@@ -12672,7 +12672,7 @@ end
 end
 
 if au.OpenButtonMain and au.OpenButtonMain.Button then
-al.AddSignal(au.OpenButtonMain.Button.TextButton.MouseButton1Click,function()
+al.AddSignal(au.OpenButtonMain.Button.MouseButton1Click,function()
 
 
 au:Open()
