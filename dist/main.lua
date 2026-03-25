@@ -4421,6 +4421,39 @@ local ac=aa(game:GetService"HttpService")
 
 local ad
 
+local function JsonSafeClone(ae,af)
+local ag=typeof(ae)
+if ag=="string"or ag=="number"or ag=="boolean"then
+return ae
+end
+
+if ae==nil then
+return nil
+end
+
+if ag~="table"then
+return nil
+end
+
+af=af or{}
+if af[ae]then
+return nil
+end
+
+af[ae]=true
+local ah={}
+for ai,aj in next,ae do
+local ak=JsonSafeClone(ai,af)
+local al=JsonSafeClone(aj,af)
+if ak~=nil and al~=nil then
+ah[ak]=al
+end
+end
+af[ae]=nil
+
+return ah
+end
+
 local function SafeInvokeCallback(ae)
 if not ae or not ae.element or type(ae.element.Callback)~="function"then
 return
@@ -4468,10 +4501,14 @@ Dropdown={
 Save=function(af)
 return{
 __type=af.__type,
-value=af.Value,
+value=JsonSafeClone(af.Value),
+values=JsonSafeClone(af.Values),
 }
 end,
 Load=function(af,ag)
+if af and af.Refresh and ag.values then
+af:Refresh(ag.values,false)
+end
 if af and af.SetValueFast then
 af:SetValueFast(ag.value,false)
 elseif af and af.Select then
@@ -4764,17 +4801,10 @@ task.wait(0.5)
 local al,am=pcall(function()
 return ai:Load()
 end)
-task.wait(1)
-local an,ao=pcall(function()
-return ai:Load()
-end)
 if al then
 if ad.Debug then print("[ WindUI.ConfigManager ] AutoLoaded config: "..ag)end
 else
 warn("[ WindUI.ConfigManager ] Failed to AutoLoad config: "..ag.." - "..tostring(am))
-end
-if not an then
-warn("[ WindUI.ConfigManager ] Retry AutoLoad failed: "..ag.." - "..tostring(ao))
 end
 end)
 end

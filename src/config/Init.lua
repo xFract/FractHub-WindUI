@@ -6,6 +6,39 @@ local HttpService = cloneref(game:GetService("HttpService"))
 
 local Window 
 
+local function JsonSafeClone(value, seen)
+    local valueType = typeof(value)
+    if valueType == "string" or valueType == "number" or valueType == "boolean" then
+        return value
+    end
+
+    if value == nil then
+        return nil
+    end
+
+    if valueType ~= "table" then
+        return nil
+    end
+
+    seen = seen or {}
+    if seen[value] then
+        return nil
+    end
+
+    seen[value] = true
+    local cloned = {}
+    for key, nestedValue in next, value do
+        local safeKey = JsonSafeClone(key, seen)
+        local safeValue = JsonSafeClone(nestedValue, seen)
+        if safeKey ~= nil and safeValue ~= nil then
+            cloned[safeKey] = safeValue
+        end
+    end
+    seen[value] = nil
+
+    return cloned
+end
+
 local function SafeInvokeCallback(entry)
     if not entry or not entry.element or type(entry.element.Callback) ~= "function" then
         return
@@ -53,10 +86,15 @@ ConfigManager = {
             Save = function(obj)
                 return {
                     __type = obj.__type,
-                    value = obj.Value,
+                    value = JsonSafeClone(obj.Value),
+                    values = JsonSafeClone(obj.Values),
                 }
             end,
             Load = function(element, data)
+                if element and element.Refresh and data.values then
+                    element:Refresh(data.values, false)
+                end
+
                 if element and element.SetValueFast then
                     element:SetValueFast(data.value, false)
                 elseif element and element.Select then
@@ -356,19 +394,10 @@ function ConfigManager:CreateConfig(configFilename, autoload)
                     return ConfigModule:Load()
                 end)
 
-                task.wait(1)
-                local retrySuccess, retryResult = pcall(function()
-                    return ConfigModule:Load()
-                end)
-
                 if success then
                     if Window.Debug then print("[ WindUI.ConfigManager ] AutoLoaded config: " .. configFilename) end
                 else
                     warn("[ WindUI.ConfigManager ] Failed to AutoLoad config: " .. configFilename .. " - " .. tostring(result))
-                end
-
-                if not retrySuccess then
-                    warn("[ WindUI.ConfigManager ] Retry AutoLoad failed: " .. configFilename .. " - " .. tostring(retryResult))
                 end
             end)
         end
