@@ -60,6 +60,49 @@ function ConfigAddon:GetAutoLoadConfigName()
 	return nil
 end
 
+function ConfigAddon:UpdateAutoLoadState(configName, enabled)
+	if not self.ConfigManager then
+		return
+	end
+
+	local targetName = (configName and configName ~= "") and configName or self.DefaultConfigName
+
+	for existingName, config in pairs(self.ConfigManager.Configs or {}) do
+		if config and type(config.SetAutoLoad) == "function" then
+			config:SetAutoLoad(enabled and existingName == targetName or false)
+		end
+	end
+
+	if not self.ConfigManager.Path or not listfiles or not readfile or not writefile then
+		return
+	end
+
+	local success, files = pcall(function()
+		return listfiles(self.ConfigManager.Path)
+	end)
+
+	if not success or not files then
+		return
+	end
+
+	for _, file in ipairs(files) do
+		if file:match("%.json$") then
+			local readSuccess, decoded = pcall(function()
+				return HttpService:JSONDecode(readfile(file))
+			end)
+
+			if readSuccess and type(decoded) == "table" then
+				local fileName = file:match("([^\\/]+)%.json$")
+				decoded.__autoload = enabled and fileName == targetName or false
+
+				pcall(function()
+					writefile(file, HttpService:JSONEncode(decoded))
+				end)
+			end
+		end
+	end
+end
+
 function ConfigAddon:EnsureConfig(configName, autoload)
 	if not self.ConfigManager then
 		return nil
@@ -70,7 +113,7 @@ function ConfigAddon:EnsureConfig(configName, autoload)
 
 	if existing then
 		if autoload ~= nil then
-			existing:SetAutoLoad(autoload)
+			self:UpdateAutoLoadState(finalName, autoload)
 		end
 		existing:SetAsCurrent()
 		self.CurrentConfig = existing
@@ -153,7 +196,7 @@ function ConfigAddon:BuildConfigSection(tab, options)
 		Callback = function(state)
 			self.AutoLoad = state
 			if self.CurrentConfig then
-				self.CurrentConfig:SetAutoLoad(state)
+				self:UpdateAutoLoadState(self.DefaultConfigName, state)
 			end
 		end,
 	})
