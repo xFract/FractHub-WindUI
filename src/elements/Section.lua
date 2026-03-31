@@ -21,6 +21,7 @@ function Element:New(Config)
         TextTransparency = Config.TextTransparency or 0.05,
         DescTextTransparency = Config.DescTextTransparency or 0.4,
         Opened = Config.Opened or false,
+        Columns = math.max(1, math.floor(Config.Columns or 1)),
         UIElements = {},
 
         HeaderSize = 42,
@@ -131,6 +132,41 @@ function Element:New(Config)
         TitleContainer.Size = UDim2.new(1, offset, 0, 0)
     end
 
+    local function createColumnFrame(parent)
+        return New("Frame", {
+            Size = UDim2.new(1, 0, 0, 0),
+            AutomaticSize = "Y",
+            BackgroundTransparency = 1,
+            Parent = parent,
+        }, {
+            New("UIListLayout", {
+                FillDirection = "Vertical",
+                Padding = UDim.new(0, Config.Tab.Gap),
+                VerticalAlignment = "Top",
+            }),
+        })
+    end
+
+    local columnFrames = {}
+    local columnsRootChildren = {}
+
+    if Section.Columns > 1 then
+        local totalGap = Config.Tab.Gap * (Section.Columns - 1)
+        local baseOffset = -math.floor(totalGap / Section.Columns)
+        local remainder = totalGap % Section.Columns
+
+        for index = 1, Section.Columns do
+            local offset = baseOffset
+            if index <= remainder then
+                offset = offset - 1
+            end
+
+            table.insert(columnsRootChildren, createColumnFrame(nil))
+            columnFrames[index] = columnsRootChildren[index]
+            columnFrames[index].Size = UDim2.new(1 / Section.Columns, offset, 0, 0)
+        end
+    end
+
 
     local Main = Creator.NewRoundFrame(Config.Window.ElementConfig.UICorner, "Squircle", {
         Size = UDim2.new(1,0,0,0),
@@ -195,6 +231,20 @@ function Element:New(Config)
                 Padding = UDim.new(0,Config.Tab.Gap),
                 VerticalAlignment = "Top",
             }),
+            Section.Columns > 1 and New("Frame", {
+                BackgroundTransparency = 1,
+                Size = UDim2.new(1, 0, 0, 0),
+                AutomaticSize = "Y",
+                Name = "Columns",
+            }, {
+                New("UIListLayout", {
+                    FillDirection = "Horizontal",
+                    Padding = UDim.new(0, Config.Tab.Gap),
+                    HorizontalAlignment = "Left",
+                    VerticalAlignment = "Top",
+                }),
+                table.unpack(columnsRootChildren),
+            }) or nil,
         })
     })
 
@@ -214,6 +264,25 @@ function Element:New(Config)
 
 
         local ElementsModule = Config.ElementsModule
+
+        if Section.Columns > 1 then
+            function Section:ResolveElementParent()
+                local selectedColumn = columnFrames[1]
+                local selectedHeight = math.huge
+
+                for _, column in ipairs(columnFrames) do
+                    local contentHeight = column.UIListLayout.AbsoluteContentSize.Y
+                    local height = contentHeight > 0 and contentHeight or #column:GetChildren()
+
+                    if height < selectedHeight then
+                        selectedHeight = height
+                        selectedColumn = column
+                    end
+                end
+
+                return selectedColumn
+            end
+        end
 
         ElementsModule.Load(Section, Main.Content, ElementsModule.Elements, Config.Window, Config.WindUI, function()
             if not Section.Expandable then

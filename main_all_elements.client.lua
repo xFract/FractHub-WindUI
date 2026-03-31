@@ -236,10 +236,11 @@ LayoutTab:Space()
 
 local BoxSection = LayoutTab:Section({
 	Title = "Section",
-	Desc = "Tab inside a boxed section.",
+	Desc = "Tab inside a boxed section. Supports 2 columns.",
 	Box = true,
 	BoxBorder = true,
 	Opened = true,
+	Columns = 2,
 })
 
 BoxSection:Toggle({
@@ -272,6 +273,17 @@ BoxSection:Slider({
 	Value = { Min = 0, Max = 10, Default = 5 },
 	Callback = function(value)
 		print("Section Slider:", value)
+	end,
+})
+
+BoxSection:Space()
+
+BoxSection:Input({
+	Title = "Section Input",
+	Flag = "section_input",
+	Placeholder = "Two-column layout",
+	Callback = function(value)
+		print("Section Input:", value)
 	end,
 })
 

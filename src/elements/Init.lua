@@ -25,7 +25,7 @@ return {
 				config.ParentTable = tbl
 				config.Index = #tbl.Elements + 1
 				config.GlobalIndex = #Window.AllElements + 1
-				config.Parent = Container
+				config.Parent = tbl.ResolveElementParent and tbl:ResolveElementParent(config) or Container
 				config.Window = Window
 				config.WindUI = WindUI
 				config.UIScale = UIScale

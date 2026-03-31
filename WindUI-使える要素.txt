@@ -148,6 +148,11 @@ Group:Button({ Title = "Test", Callback = function() end })
 Group:Toggle({ Title = "Enabled", Value = true, Callback = function(v) end })
 横並び用。中に Button / Toggle などを置ける。
 
+例: Toggle を横並び
+local FarmToggleGroup = FarmSection:Group()
+FarmToggleGroup:Toggle({ Title = "Auto Farm", Flag = "auto_farm", Value = false, Callback = function(v) end })
+FarmToggleGroup:Toggle({ Title = "Wait In Air", Flag = "hover_when_idle", Value = false, Callback = function(v) end })
+
 Section
 local FarmSection = MainTab:Section({
 	Title = "Farm Settings",
@@ -155,12 +160,13 @@ local FarmSection = MainTab:Section({
 	Box = true,
 	BoxBorder = true,
 	Opened = true,
+	Columns = 2,
 })
 
 FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })
 FarmSection:Dropdown({ Title = "Position", Value = "Above", Values = { "Above", "Below" }, Callback = function(v) end })
 FarmSection:Slider({ Title = "Distance", Step = 1, Value = { Min = 0, Max = 50, Default = 15 }, Callback = function(v) end })
-タブ内の枠付きセクション。
+タブ内の枠付きセクション。`Columns = 2` を指定すると中身を2カラムにできる。
 
 コンフィグ保存
 対応要素は Toggle / Slider / Input / Dropdown / Keybind / Colorpicker。

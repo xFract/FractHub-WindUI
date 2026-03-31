@@ -4,9 +4,10 @@ import argparse
 import shutil
 import subprocess
 import sys
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, NamedTuple
 
 
 REPO_ROOT = Path(__file__).resolve().parent
@@ -15,6 +16,21 @@ WINDOWS_GIT_CANDIDATES = (
     Path(r"C:\Program Files\Git\bin\git.exe"),
     Path(r"C:\Program Files (x86)\Git\cmd\git.exe"),
 )
+
+STATUS_LABELS = {
+    "A": "added",
+    "M": "modified",
+    "D": "deleted",
+    "R": "renamed",
+    "C": "copied",
+    "?": "untracked",
+    "U": "unmerged",
+}
+
+
+class StatusEntry(NamedTuple):
+    code: str
+    path: str
 
 
 def find_git() -> str:
@@ -51,16 +67,79 @@ def get_status_lines(git: str) -> list[str]:
     return [line.rstrip() for line in result.stdout.splitlines() if line.strip()]
 
 
+def parse_status_entry(line: str) -> StatusEntry:
+    code = line[:2]
+    path = line[3:].strip()
+
+    if "->" in path:
+        path = path.split("->", maxsplit=1)[1].strip()
+
+    return StatusEntry(code=code, path=path)
+
+
+def summarize_status_entries(status_lines: list[str]) -> str:
+    entries = [parse_status_entry(line) for line in status_lines]
+    counts: Counter[str] = Counter()
+
+    for entry in entries:
+        normalized_code = next(
+            (char for char in entry.code if char not in {" ", ""}),
+            "?",
+        )
+        counts[STATUS_LABELS.get(normalized_code, "updated")] += 1
+
+    parts = [
+        f"{count} {label}"
+        for label, count in (
+            ("modified", counts["modified"]),
+            ("added", counts["added"] + counts["untracked"]),
+            ("deleted", counts["deleted"]),
+            ("renamed", counts["renamed"]),
+            ("copied", counts["copied"]),
+            ("unmerged", counts["unmerged"]),
+            ("updated", counts["updated"]),
+        )
+        if count
+    ]
+
+    file_preview = ", ".join(entry.path for entry in entries[:3])
+    if len(entries) > 3:
+        file_preview += f", +{len(entries) - 3} more"
+
+    return f"{'; '.join(parts)}. Files: {file_preview}"
+
+
 def build_commit_message(status_lines: list[str]) -> str:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if not status_lines:
         return f"Auto commit {timestamp}"
 
-    changed_files = [line[3:] for line in status_lines if len(line) >= 4]
+    entries = [parse_status_entry(line) for line in status_lines]
+    changed_files = [entry.path for entry in entries]
     if len(changed_files) == 1:
         return f"Update {changed_files[0]}"
 
-    return f"Auto update {len(changed_files)} files ({timestamp})"
+    counts: Counter[str] = Counter()
+    for entry in entries:
+        normalized_code = next(
+            (char for char in entry.code if char not in {" ", ""}),
+            "?",
+        )
+        counts[STATUS_LABELS.get(normalized_code, "updated")] += 1
+
+    if counts["modified"] and len(changed_files) <= 3:
+        return f"Update {'; '.join(changed_files)}"
+
+    dominant_label = next(
+        (
+            label
+            for label in ("modified", "added", "deleted", "renamed", "updated")
+            if counts[label]
+        ),
+        "update",
+    )
+
+    return f"Auto {dominant_label} {len(changed_files)} files ({timestamp})"
 
 
 def main() -> int:
@@ -91,6 +170,11 @@ def main() -> int:
         action="store_true",
         help="Show what would be committed and pushed without changing anything.",
     )
+    parser.add_argument(
+        "--summary-only",
+        action="store_true",
+        help="Print a compact summary of current changes and exit.",
+    )
     args = parser.parse_args()
 
     git = find_git()
@@ -102,14 +186,20 @@ def main() -> int:
 
     branch = args.branch or get_current_branch(git)
     message = args.message or build_commit_message(status_lines)
+    summary = summarize_status_entries(status_lines)
 
     print("Repository:", REPO_ROOT)
     print("Git:", git)
     print("Branch:", branch)
     print("Commit message:", message)
+    print("Summary:", summary)
     print("Changed files:")
     for line in status_lines:
         print(" ", line)
+
+    if args.summary_only:
+        print("Summary only mode complete. No changes were staged, committed, or pushed.")
+        return 0
 
     if args.dry_run:
         print("Dry run complete. No changes were staged, committed, or pushed.")
