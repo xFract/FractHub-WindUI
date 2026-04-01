@@ -216,6 +216,7 @@ local LayoutTab = MainSection:Tab({
 	Title = "Layout",
 	Icon = "boxes",
 	Columns = 2,
+	MinColumnWidth = 180,
 })
 
 local Group = LayoutTab:Group()
@@ -241,6 +242,7 @@ local BoxSection = LayoutTab:Section({
 	Box = true,
 	BoxBorder = true,
 	Opened = true,
+	MinColumnWidth = 140,
 })
 
 BoxSection:Toggle({
@@ -293,6 +295,7 @@ local BoxSectionTwo = LayoutTab:Section({
 	Box = true,
 	BoxBorder = true,
 	Opened = true,
+	MinColumnWidth = 140,
 })
 
 BoxSectionTwo:Toggle({

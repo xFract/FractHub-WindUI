@@ -22,7 +22,7 @@ function Element:New(Config)
         DescTextTransparency = Config.DescTextTransparency or 0.4,
         Opened = Config.Opened or false,
         Columns = math.max(1, math.floor(Config.Columns or 1)),
-        MinColumnWidth = Config.MinColumnWidth or 180,
+        MinColumnWidth = Config.MinColumnWidth or 140,
         UIElements = {},
 
         HeaderSize = 42,

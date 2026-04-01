@@ -19,6 +19,7 @@ Window:Tab({ Title = "Main", Icon = "home" })
 
 Window:Tab({ Title = "Layout", Icon = "boxes", Columns = 2 })
 `Box = true` の Section をタブ内で2カラム配置できる。
+必要なら `MinColumnWidth = 180` などを付けて、何px相当で1カラムへ戻すか調整できる。
 
 Section:Tab({ Title = "Main", Icon = "home" })
 Section の中にタブを作る。
@@ -164,6 +165,7 @@ local FarmSection = MainTab:Section({
 	BoxBorder = true,
 	Opened = true,
 	Columns = 2,
+	MinColumnWidth = 140,
 })
 
 FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })
@@ -176,6 +178,7 @@ local LayoutTab = MainSection:Tab({
 	Title = "Layout",
 	Icon = "boxes",
 	Columns = 2,
+	MinColumnWidth = 180,
 })
 
 local BoxSectionA = LayoutTab:Section({

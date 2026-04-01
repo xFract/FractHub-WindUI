@@ -9308,7 +9308,7 @@ TextTransparency=ak.TextTransparency or 0.05,
 DescTextTransparency=ak.DescTextTransparency or 0.4,
 Opened=ak.Opened or false,
 Columns=math.max(1,math.floor(ak.Columns or 1)),
-MinColumnWidth=ak.MinColumnWidth or 180,
+MinColumnWidth=ak.MinColumnWidth or 140,
 UIElements={},
 
 HeaderSize=42,
@@ -10120,7 +10120,7 @@ Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
 Columns=math.max(1,math.floor(an.Columns or 1)),
-MinColumnWidth=an.MinColumnWidth or 260,
+MinColumnWidth=an.MinColumnWidth or 180,
 
 Gap=Window.NewElements and 1 or 6,
 

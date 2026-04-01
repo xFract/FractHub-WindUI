@@ -59,7 +59,7 @@ function TabModule.New(Config, UIScale)
 		ContainerFrame = nil,
 		UICorner = Window.UICorner - (Window.UIPadding / 2),
 		Columns = math.max(1, math.floor(Config.Columns or 1)),
-		MinColumnWidth = Config.MinColumnWidth or 260,
+		MinColumnWidth = Config.MinColumnWidth or 180,
 
 		Gap = Window.NewElements and 1 or 6,
 
