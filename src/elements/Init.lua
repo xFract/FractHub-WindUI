@@ -23,6 +23,7 @@ return {
 				config.Tab = Tab or tbl
 				config.ParentType = tbl.__type
 				config.ParentTable = tbl
+				config.ElementType = name
 				config.Index = #tbl.Elements + 1
 				config.GlobalIndex = #Window.AllElements + 1
 				config.Parent = tbl.ResolveElementParent and tbl:ResolveElementParent(config) or Container

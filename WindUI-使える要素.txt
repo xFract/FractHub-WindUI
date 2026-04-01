@@ -17,6 +17,9 @@ Window:Section({ Title = "Section Name" })
 Window:Tab({ Title = "Main", Icon = "home" })
 サイドバーに直接タブを作る。
 
+Window:Tab({ Title = "Layout", Icon = "boxes", Columns = 2 })
+`Box = true` の Section をタブ内で2カラム配置できる。
+
 Section:Tab({ Title = "Main", Icon = "home" })
 Section の中にタブを作る。
 
@@ -167,6 +170,30 @@ FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) 
 FarmSection:Dropdown({ Title = "Position", Value = "Above", Values = { "Above", "Below" }, Callback = function(v) end })
 FarmSection:Slider({ Title = "Distance", Step = 1, Value = { Min = 0, Max = 50, Default = 15 }, Callback = function(v) end })
 タブ内の枠付きセクション。`Columns = 2` を指定すると中身を2カラムにできる。
+
+例: Box Section を2カラム配置
+local LayoutTab = MainSection:Tab({
+	Title = "Layout",
+	Icon = "boxes",
+	Columns = 2,
+})
+
+local BoxSectionA = LayoutTab:Section({
+	Title = "Section A",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+local BoxSectionB = LayoutTab:Section({
+	Title = "Section B",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+BoxSectionA:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })
+BoxSectionB:Dropdown({ Title = "Position", Value = "Above", Values = { "Above", "Below" }, Callback = function(v) end })
 
 コンフィグ保存
 対応要素は Toggle / Slider / Input / Dropdown / Keybind / Colorpicker。

@@ -58,6 +58,7 @@ function TabModule.New(Config, UIScale)
 		Elements = {},
 		ContainerFrame = nil,
 		UICorner = Window.UICorner - (Window.UIPadding / 2),
+		Columns = math.max(1, math.floor(Config.Columns or 1)),
 
 		Gap = Window.NewElements and 1 or 6,
 
@@ -337,6 +338,88 @@ function TabModule.New(Config, UIScale)
 	TabModule.Tabs[TabIndex] = Tab
 
 	Tab.ContainerFrame = Tab.UIElements.ContainerFrameCanvas
+
+	local sectionColumnsRoot
+	local sectionColumnFrames = {}
+
+	local function createSectionColumn(parent, size)
+		return New("Frame", {
+			Size = size,
+			AutomaticSize = "Y",
+			BackgroundTransparency = 1,
+			Parent = parent,
+		}, {
+			New("UIListLayout", {
+				SortOrder = "LayoutOrder",
+				Padding = UDim.new(0, Tab.Gap),
+				VerticalAlignment = "Top",
+			}),
+		})
+	end
+
+	local function ensureSectionColumns()
+		if sectionColumnsRoot or Tab.Columns <= 1 then
+			return
+		end
+
+		local totalGap = Tab.Gap * (Tab.Columns - 1)
+		local baseOffset = -math.floor(totalGap / Tab.Columns)
+		local remainder = totalGap % Tab.Columns
+		local columnChildren = {}
+
+		for index = 1, Tab.Columns do
+			local offset = baseOffset
+			if index <= remainder then
+				offset = offset - 1
+			end
+
+			local column = createSectionColumn(nil, UDim2.new(1 / Tab.Columns, offset, 0, 0))
+			sectionColumnFrames[index] = column
+			table.insert(columnChildren, column)
+		end
+
+		sectionColumnsRoot = New("Frame", {
+			BackgroundTransparency = 1,
+			Size = UDim2.new(1, 0, 0, 0),
+			AutomaticSize = "Y",
+			Name = "SectionColumns",
+			Parent = Tab.UIElements.ContainerFrame,
+		}, {
+			New("UIListLayout", {
+				SortOrder = "LayoutOrder",
+				FillDirection = "Horizontal",
+				Padding = UDim.new(0, Tab.Gap),
+				HorizontalAlignment = "Left",
+				VerticalAlignment = "Top",
+			}),
+			table.unpack(columnChildren),
+		})
+	end
+
+	if Tab.Columns > 1 then
+		function Tab:ResolveElementParent(config)
+			if config.ElementType == "Section" and config.Box then
+				ensureSectionColumns()
+
+				local selectedColumn = sectionColumnFrames[1]
+				local selectedHeight = math.huge
+
+				for _, column in ipairs(sectionColumnFrames) do
+					local contentHeight = column.UIListLayout.AbsoluteContentSize.Y
+					local height = contentHeight > 0 and contentHeight or #column:GetChildren()
+
+					if height < selectedHeight then
+						selectedHeight = height
+						selectedColumn = column
+					end
+				end
+
+				return selectedColumn
+			end
+
+			return Tab.UIElements.ContainerFrame
+		end
+	end
 
 	Creator.AddSignal(Tab.UIElements.Main.MouseButton1Click, function()
 		if not Tab.Locked then

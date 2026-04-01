@@ -215,6 +215,7 @@ DisplayTab:Paragraph({
 local LayoutTab = MainSection:Tab({
 	Title = "Layout",
 	Icon = "boxes",
+	Columns = 2,
 })
 
 local Group = LayoutTab:Group()
@@ -235,12 +236,11 @@ Group:Toggle({
 LayoutTab:Space()
 
 local BoxSection = LayoutTab:Section({
-	Title = "Section",
-	Desc = "Tab inside a boxed section. Supports 2 columns.",
+	Title = "Section A",
+	Desc = "Box sections can now sit in two columns.",
 	Box = true,
 	BoxBorder = true,
 	Opened = true,
-	Columns = 2,
 })
 
 BoxSection:Toggle({
@@ -281,9 +281,38 @@ BoxSection:Space()
 BoxSection:Input({
 	Title = "Section Input",
 	Flag = "section_input",
-	Placeholder = "Two-column layout",
+	Placeholder = "Box section A",
 	Callback = function(value)
 		print("Section Input:", value)
+	end,
+})
+
+local BoxSectionTwo = LayoutTab:Section({
+	Title = "Section B",
+	Desc = "Placed beside Section A when the tab uses Columns = 2.",
+	Box = true,
+	BoxBorder = true,
+	Opened = true,
+})
+
+BoxSectionTwo:Toggle({
+	Title = "Second Toggle",
+	Flag = "section_toggle_2",
+	Value = true,
+	Callback = function(state)
+		print("Second Toggle:", state)
+	end,
+})
+
+BoxSectionTwo:Space()
+
+BoxSectionTwo:Dropdown({
+	Title = "Second Dropdown",
+	Flag = "section_dropdown_2",
+	Value = "Left",
+	Values = { "Left", "Right" },
+	Callback = function(value)
+		print("Second Dropdown:", value)
 	end,
 })
 
