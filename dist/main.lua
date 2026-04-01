@@ -9295,6 +9295,7 @@ DescFontWeight=ak.DescFontWeight or Enum.FontWeight.Medium,
 TextTransparency=ak.TextTransparency or 0.05,
 DescTextTransparency=ak.DescTextTransparency or 0.4,
 Opened=ak.Opened or false,
+Columns=math.max(1,math.floor(ak.Columns or 1)),
 UIElements={},
 
 HeaderSize=42,
@@ -9405,6 +9406,41 @@ end
 ao.Size=UDim2.new(1,ar,0,0)
 end
 
+local function createColumnFrame(ar)
+return ae("Frame",{
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=ar,
+},{
+ae("UIListLayout",{
+FillDirection="Vertical",
+Padding=UDim.new(0,ak.Tab.Gap),
+VerticalAlignment="Top",
+}),
+})
+end
+
+local as={}
+local at={}
+
+if al.Columns>1 then
+local au=ak.Tab.Gap*(al.Columns-1)
+local av=-math.floor(au/al.Columns)
+local aw=au%al.Columns
+
+for ax=1,al.Columns do
+local ay=av
+if ax<=aw then
+ay=ay-1
+end
+
+table.insert(at,createColumnFrame(nil))
+as[ax]=at[ax]
+as[ax].Size=UDim2.new(1/al.Columns,ay,0,0)
+end
+end
+
 
 local ar=aa.NewRoundFrame(ak.Window.ElementConfig.UICorner,"Squircle",{
 Size=UDim2.new(1,0,0,0),
@@ -9469,6 +9505,20 @@ FillDirection="Vertical",
 Padding=UDim.new(0,ak.Tab.Gap),
 VerticalAlignment="Top",
 }),
+al.Columns>1 and ae("Frame",{
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+Name="Columns",
+},{
+ae("UIListLayout",{
+FillDirection="Horizontal",
+Padding=UDim.new(0,ak.Tab.Gap),
+HorizontalAlignment="Left",
+VerticalAlignment="Top",
+}),
+table.unpack(at),
+})or nil,
 })
 })
 
@@ -9487,15 +9537,34 @@ end)
 end
 
 
-local as=ak.ElementsModule
+local au=ak.ElementsModule
 
-as.Load(al,ar.Content,as.Elements,ak.Window,ak.WindUI,function()
+if al.Columns>1 then
+function al.ResolveElementParent(av)
+local aw=as[1]
+local ax=math.huge
+
+for ay,az in ipairs(as)do
+local aA=az.UIListLayout.AbsoluteContentSize.Y
+local aB=aA>0 and aA or#az:GetChildren()
+
+if aB<ax then
+ax=aB
+aw=az
+end
+end
+
+return aw
+end
+end
+
+au.Load(al,ar.Content,au.Elements,ak.Window,ak.WindUI,function()
 if not al.Expandable then
 al.Expandable=true
 an.Visible=true
 UpdateTitleSize()
 end
-end,as,ak.UIScale,ak.Tab)
+end,au,ak.UIScale,ak.Tab)
 
 
 UpdateTitleSize()
@@ -9794,9 +9863,10 @@ ar=ar or{}
 ar.Tab=an or aa
 ar.ParentType=aa.__type
 ar.ParentTable=aa
+ar.ElementType=ao
 ar.Index=#aa.Elements+1
 ar.GlobalIndex=#ah.AllElements+1
-ar.Parent=ae
+ar.Parent=aa.ResolveElementParent and aa:ResolveElementParent(ar)or ae
 ar.Window=ah
 ar.WindUI=aj
 ar.UIScale=am
@@ -9971,6 +10041,7 @@ UIElements={},
 Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
+Columns=math.max(1,math.floor(an.Columns or 1)),
 
 Gap=Window.NewElements and 1 or 6,
 
@@ -10251,6 +10322,88 @@ am.Tabs[aq]=ap
 
 ap.ContainerFrame=ap.UIElements.ContainerFrameCanvas
 
+local au
+local av={}
+
+local function createSectionColumn(aw,ax)
+return aj("Frame",{
+Size=ax,
+AutomaticSize="Y",
+BackgroundTransparency=1,
+Parent=aw,
+},{
+aj("UIListLayout",{
+SortOrder="LayoutOrder",
+Padding=UDim.new(0,ap.Gap),
+VerticalAlignment="Top",
+}),
+})
+end
+
+local function ensureSectionColumns()
+if au or ap.Columns<=1 then
+return
+end
+
+local aw=ap.Gap*(ap.Columns-1)
+local ax=-math.floor(aw/ap.Columns)
+local ay=aw%ap.Columns
+local az={}
+
+for aA=1,ap.Columns do
+local aB=ax
+if aA<=ay then
+aB=aB-1
+end
+
+local aC=createSectionColumn(nil,UDim2.new(1/ap.Columns,aB,0,0))
+av[aA]=aC
+table.insert(az,aC)
+end
+
+au=aj("Frame",{
+BackgroundTransparency=1,
+Size=UDim2.new(1,0,0,0),
+AutomaticSize="Y",
+Name="SectionColumns",
+Parent=ap.UIElements.ContainerFrame,
+},{
+aj("UIListLayout",{
+SortOrder="LayoutOrder",
+FillDirection="Horizontal",
+Padding=UDim.new(0,ap.Gap),
+HorizontalAlignment="Left",
+VerticalAlignment="Top",
+}),
+table.unpack(az),
+})
+end
+
+if ap.Columns>1 then
+function ap.ResolveElementParent(aw,ax)
+if ax.ElementType=="Section"and ax.Box then
+ensureSectionColumns()
+
+local ay=av[1]
+local az=math.huge
+
+for aA,aB in ipairs(av)do
+local aC=aB.UIListLayout.AbsoluteContentSize.Y
+local aD=aC>0 and aC or#aB:GetChildren()
+
+if aD<az then
+az=aD
+ay=aB
+end
+end
+
+return ay
+end
+
+return ap.UIElements.ContainerFrame
+end
+end
+
 ah.AddSignal(ap.UIElements.Main.MouseButton1Click,function()
 if not ap.Locked then
 am:SelectTab(aq)
@@ -10261,30 +10414,30 @@ if Window.ScrollBarEnabled then
 al(ap.UIElements.ContainerFrame,ap.UIElements.ContainerFrameCanvas,Window,3)
 end
 
-local au
-local av
 local aw
-local ax=false
+local ax
+local ay
+local az=false
 
 
 if ap.Desc then
 ah.AddSignal(ap.UIElements.Main.InputBegan,function()
-ax=true
-av=task.spawn(function()
+az=true
+ax=task.spawn(function()
 task.wait(0.35)
-if ax and not au then
-au=ak(ap.Desc,am.ToolTipParent,true)
-au.Container.AnchorPoint=Vector2.new(0.5,0.5)
+if az and not aw then
+aw=ak(ap.Desc,am.ToolTipParent,true)
+aw.Container.AnchorPoint=Vector2.new(0.5,0.5)
 
 local function updatePosition()
-if au then
-au.Container.Position=UDim2.new(0,af.X,0,af.Y-4)
+if aw then
+aw.Container.Position=UDim2.new(0,af.X,0,af.Y-4)
 end
 end
 
 updatePosition()
-aw=af.Move:Connect(updatePosition)
-au:Open()
+ay=af.Move:Connect(updatePosition)
+aw:Open()
 end
 end)
 end)
@@ -10300,18 +10453,18 @@ end
 end)
 ah.AddSignal(ap.UIElements.Main.InputEnded,function()
 if ap.Desc then
-ax=false
-if av then
-task.cancel(av)
-av=nil
+az=false
+if ax then
+task.cancel(ax)
+ax=nil
+end
+if ay then
+ay:Disconnect()
+ay=nil
 end
 if aw then
-aw:Disconnect()
+aw:Close()
 aw=nil
-end
-if au then
-au:Close()
-au=nil
 end
 end
 
