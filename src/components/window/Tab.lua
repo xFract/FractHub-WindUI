@@ -454,7 +454,8 @@ function TabModule.New(Config, UIScale)
 		local currentColumn = 1
 		for _, element in ipairs(Tab.Elements) do
 			if element.__type == "Section" and element.Box and element.ElementFrame then
-				element.ElementFrame.Parent = sectionColumnFrames[currentColumn]
+				element.ElementFrame.Parent =
+					sectionColumnFrames[math.clamp(element.AssignedColumnIndex or currentColumn, 1, activeSectionColumnCount)]
 				currentColumn = currentColumn + 1
 				if currentColumn > activeSectionColumnCount then
 					currentColumn = 1
@@ -468,6 +469,7 @@ function TabModule.New(Config, UIScale)
 			if config.ElementType == "Section" and config.Box then
 				ensureSectionColumns()
 				local targetIndex = math.clamp(nextSectionColumnIndex, 1, Tab.Columns)
+				config.ParentColumnIndex = targetIndex
 				nextSectionColumnIndex = nextSectionColumnIndex + 1
 				if nextSectionColumnIndex > Tab.Columns then
 					nextSectionColumnIndex = 1

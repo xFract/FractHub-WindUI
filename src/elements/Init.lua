@@ -33,6 +33,9 @@ return {
 				config.ElementsModule = ElementsModule
 
 				local elementInstance, content = module:New(config)
+				if config.ParentColumnIndex then
+					content.AssignedColumnIndex = config.ParentColumnIndex
+				end
 
 				if config.Flag and typeof(config.Flag) == "string" then
 					if Window.CurrentConfig then

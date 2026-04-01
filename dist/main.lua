@@ -9611,7 +9611,7 @@ end
 local ay=1
 for az,aA in ipairs(al.Elements)do
 if aA.ElementFrame then
-aA.ElementFrame.Parent=as[ay]
+aA.ElementFrame.Parent=as[math.clamp(aA.AssignedColumnIndex or ay,1,aE)]
 ay=ay+1
 if ay>aE then
 ay=1
@@ -9623,6 +9623,7 @@ end
 if al.Columns>1 then
 function al.ResolveElementParent(av)
 local aw=math.clamp(aF,1,al.Columns)
+ak.ParentColumnIndex=aw
 aF=aF+1
 if aF>al.Columns then
 aF=1
@@ -9957,6 +9958,9 @@ ar.UIScale=am
 ar.ElementsModule=al local
 
 as, at=ap:New(ar)
+if ar.ParentColumnIndex then
+at.AssignedColumnIndex=ar.ParentColumnIndex
+end
 
 if ar.Flag and typeof(ar.Flag)=="string"then
 if ah.CurrentConfig then
@@ -10520,7 +10524,7 @@ end
 local az=1
 for aA,aB in ipairs(ap.Elements)do
 if aB.__type=="Section"and aB.Box and aB.ElementFrame then
-aB.ElementFrame.Parent=av[az]
+aB.ElementFrame.Parent=av[math.clamp(aB.AssignedColumnIndex or az,1,aE)]
 az=az+1
 if az>aE then
 az=1
@@ -10534,6 +10538,7 @@ function ap.ResolveElementParent(aw,ax)
 if ax.ElementType=="Section"and ax.Box then
 ensureSectionColumns()
 local ay=math.clamp(aF,1,ap.Columns)
+ax.ParentColumnIndex=ay
 aF=aF+1
 if aF>ap.Columns then
 aF=1

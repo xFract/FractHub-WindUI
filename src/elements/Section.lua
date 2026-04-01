@@ -325,7 +325,8 @@ function Element:New(Config)
             local currentColumn = 1
             for _, element in ipairs(Section.Elements) do
                 if element.ElementFrame then
-                    element.ElementFrame.Parent = columnFrames[currentColumn]
+                    element.ElementFrame.Parent =
+                        columnFrames[math.clamp(element.AssignedColumnIndex or currentColumn, 1, activeColumnCount)]
                     currentColumn = currentColumn + 1
                     if currentColumn > activeColumnCount then
                         currentColumn = 1
@@ -337,6 +338,7 @@ function Element:New(Config)
         if Section.Columns > 1 then
             function Section:ResolveElementParent()
                 local targetIndex = math.clamp(nextColumnIndex, 1, Section.Columns)
+                Config.ParentColumnIndex = targetIndex
                 nextColumnIndex = nextColumnIndex + 1
                 if nextColumnIndex > Section.Columns then
                     nextColumnIndex = 1
