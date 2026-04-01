@@ -9308,7 +9308,7 @@ TextTransparency=ak.TextTransparency or 0.05,
 DescTextTransparency=ak.DescTextTransparency or 0.4,
 Opened=ak.Opened or false,
 Columns=math.max(1,math.floor(ak.Columns or 1)),
-MinColumnWidth=ak.MinColumnWidth or 140,
+MinColumnWidth=ak.MinColumnWidth or 180,
 UIElements={},
 
 HeaderSize=42,
@@ -10642,7 +10642,7 @@ WindUI,
 function(az)
 if ap.Columns>1 and az.__type=="Section"and az.Box then
 ensureSectionColumns()
-updateSectionColumns()
+task.defer(updateSectionColumns)
 end
 end,
 ay,
@@ -10651,6 +10651,11 @@ ao
 
 if ap.Columns>1 then
 ah.AddSignal(ap.UIElements.ContainerFrame:GetPropertyChangedSignal"AbsoluteSize",function()
+if au then
+updateSectionColumns()
+end
+end)
+task.defer(function()
 if au then
 updateSectionColumns()
 end

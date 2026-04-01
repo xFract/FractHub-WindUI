@@ -165,7 +165,7 @@ local FarmSection = MainTab:Section({
 	BoxBorder = true,
 	Opened = true,
 	Columns = 2,
-	MinColumnWidth = 140,
+	MinColumnWidth = 180,
 })
 
 FarmSection:Toggle({ Title = "Auto Farm", Value = false, Callback = function(v) end })

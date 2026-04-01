@@ -582,7 +582,7 @@ function TabModule.New(Config, UIScale)
 		function(currentElement)
 			if Tab.Columns > 1 and currentElement.__type == "Section" and currentElement.Box then
 				ensureSectionColumns()
-				updateSectionColumns()
+				task.defer(updateSectionColumns)
 			end
 		end,
 		ElementsModule,
@@ -591,6 +591,11 @@ function TabModule.New(Config, UIScale)
 
 	if Tab.Columns > 1 then
 		Creator.AddSignal(Tab.UIElements.ContainerFrame:GetPropertyChangedSignal("AbsoluteSize"), function()
+			if sectionColumnsRoot then
+				updateSectionColumns()
+			end
+		end)
+		task.defer(function()
 			if sectionColumnsRoot then
 				updateSectionColumns()
 			end
