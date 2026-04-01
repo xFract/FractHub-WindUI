@@ -59,6 +59,7 @@ function TabModule.New(Config, UIScale)
 		ContainerFrame = nil,
 		UICorner = Window.UICorner - (Window.UIPadding / 2),
 		Columns = math.max(1, math.floor(Config.Columns or 1)),
+		MinColumnWidth = Config.MinColumnWidth or 260,
 
 		Gap = Window.NewElements and 1 or 6,
 
@@ -341,6 +342,8 @@ function TabModule.New(Config, UIScale)
 
 	local sectionColumnsRoot
 	local sectionColumnFrames = {}
+	local sectionColumnsLayout
+	local activeSectionColumnCount = 1
 
 	local function createSectionColumn(parent, size)
 		return New("Frame", {
@@ -394,27 +397,77 @@ function TabModule.New(Config, UIScale)
 			}),
 			table.unpack(columnChildren),
 		})
+
+		sectionColumnsLayout = sectionColumnsRoot.UIListLayout
+	end
+
+	local function getAvailableSectionWidth()
+		local width = sectionColumnsRoot and sectionColumnsRoot.AbsoluteSize.X or 0
+		if width <= 0 then
+			width = Tab.UIElements.ContainerFrame.AbsoluteSize.X
+		end
+		return width
+	end
+
+	local function getActiveSectionColumnCount()
+		if Tab.Columns <= 1 then
+			return 1
+		end
+
+		local width = getAvailableSectionWidth()
+		if width <= 0 then
+			return 1
+		end
+
+		local count = math.floor((width + Tab.Gap) / (Tab.MinColumnWidth + Tab.Gap))
+		return math.clamp(count, 1, Tab.Columns)
+	end
+
+	local function updateSectionColumns()
+		if not sectionColumnsRoot then
+			return
+		end
+
+		activeSectionColumnCount = getActiveSectionColumnCount()
+		sectionColumnsLayout.FillDirection = activeSectionColumnCount > 1 and "Horizontal" or "Vertical"
+
+		local totalGap = Tab.Gap * math.max(activeSectionColumnCount - 1, 0)
+		local baseOffset = activeSectionColumnCount > 0 and -math.floor(totalGap / activeSectionColumnCount) or 0
+		local remainder = activeSectionColumnCount > 0 and (totalGap % activeSectionColumnCount) or 0
+
+		for index, column in ipairs(sectionColumnFrames) do
+			local isActive = index <= activeSectionColumnCount
+			column.Visible = isActive
+
+			if isActive and activeSectionColumnCount > 1 then
+				local offset = baseOffset
+				if index <= remainder then
+					offset = offset - 1
+				end
+				column.Size = UDim2.new(1 / activeSectionColumnCount, offset, 0, 0)
+			else
+				column.Size = UDim2.new(1, 0, 0, 0)
+			end
+		end
+
+		local currentColumn = 1
+		for _, element in ipairs(Tab.Elements) do
+			if element.__type == "Section" and element.Box and element.ElementFrame then
+				element.ElementFrame.Parent = sectionColumnFrames[currentColumn]
+				currentColumn = currentColumn + 1
+				if currentColumn > activeSectionColumnCount then
+					currentColumn = 1
+				end
+			end
+		end
 	end
 
 	if Tab.Columns > 1 then
 		function Tab:ResolveElementParent(config)
 			if config.ElementType == "Section" and config.Box then
 				ensureSectionColumns()
-
-				local selectedColumn = sectionColumnFrames[1]
-				local selectedHeight = math.huge
-
-				for _, column in ipairs(sectionColumnFrames) do
-					local contentHeight = column.UIListLayout.AbsoluteContentSize.Y
-					local height = contentHeight > 0 and contentHeight or #column:GetChildren()
-
-					if height < selectedHeight then
-						selectedHeight = height
-						selectedColumn = column
-					end
-				end
-
-				return selectedColumn
+				updateSectionColumns()
+				return sectionColumnFrames[1]
 			end
 
 			return Tab.UIElements.ContainerFrame
@@ -526,10 +579,23 @@ function TabModule.New(Config, UIScale)
 		ElementsModule.Elements,
 		Window,
 		WindUI,
-		nil,
+		function(currentElement)
+			if Tab.Columns > 1 and currentElement.__type == "Section" and currentElement.Box then
+				ensureSectionColumns()
+				updateSectionColumns()
+			end
+		end,
 		ElementsModule,
 		UIScale
 	)
+
+	if Tab.Columns > 1 then
+		Creator.AddSignal(Tab.UIElements.ContainerFrame:GetPropertyChangedSignal("AbsoluteSize"), function()
+			if sectionColumnsRoot then
+				updateSectionColumns()
+			end
+		end)
+	end
 
 	function Tab:LockAll()
 		--print("LockAll called, number of elements: " .. #self.Elements)

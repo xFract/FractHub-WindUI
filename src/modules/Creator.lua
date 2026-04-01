@@ -738,8 +738,15 @@ function Creator.Image(Img, Name, Corner, Folder, Type, IsThemeTag, Themed, Them
 			}),
 		}),
 	})
+
+	local function getImageLabel()
+		return ImageFrame:FindFirstChild("ImageLabel") or ImageFrame:FindFirstChildOfClass("ImageLabel")
+	end
 	if Creator.Icon(Img) then
-		ImageFrame.ImageLabel:Destroy()
+		local baseImageLabel = getImageLabel()
+		if baseImageLabel then
+			baseImageLabel:Destroy()
+		end
 
 		local IconLabel = Icons.Image({
 			Icon = Img,
@@ -768,7 +775,10 @@ function Creator.Image(Img, Name, Corner, Folder, Type, IsThemeTag, Themed, Them
 
 				local assetSuccess, asset = pcall(getcustomasset, FileName)
 				if assetSuccess then
-					ImageFrame.ImageLabel.Image = asset
+					local imageLabel = getImageLabel()
+					if imageLabel then
+						imageLabel.Image = asset
+					end
 				else
 					warn(
 						string.format(
@@ -794,7 +804,10 @@ function Creator.Image(Img, Name, Corner, Folder, Type, IsThemeTag, Themed, Them
 	elseif Img == "" then
 		ImageFrame.Visible = false
 	else
-		ImageFrame.ImageLabel.Image = Img
+		local imageLabel = getImageLabel()
+		if imageLabel then
+			imageLabel.Image = Img
+		end
 	end
 
 	return ImageFrame

@@ -22,6 +22,7 @@ function Element:New(Config)
         DescTextTransparency = Config.DescTextTransparency or 0.4,
         Opened = Config.Opened or false,
         Columns = math.max(1, math.floor(Config.Columns or 1)),
+        MinColumnWidth = Config.MinColumnWidth or 180,
         UIElements = {},
 
         HeaderSize = 42,
@@ -149,6 +150,9 @@ function Element:New(Config)
 
     local columnFrames = {}
     local columnsRootChildren = {}
+    local columnsRoot
+    local columnsLayout
+    local activeColumnCount = 1
 
     if Section.Columns > 1 then
         local totalGap = Config.Tab.Gap * (Section.Columns - 1)
@@ -248,6 +252,9 @@ function Element:New(Config)
         })
     })
 
+        columnsRoot = Main.Content:FindFirstChild("Columns")
+        columnsLayout = columnsRoot and columnsRoot:FindFirstChildOfClass("UIListLayout") or nil
+
     -- Section.UIElements.Main:GetPropertyChangedSignal("TextBounds"):Connect(function()
         --     Section.UIElements.Main.Size = UDim2.new(1,0,0,Section.UIElements.Main.TextBounds.Y)
         -- end)
@@ -265,22 +272,71 @@ function Element:New(Config)
 
         local ElementsModule = Config.ElementsModule
 
-        if Section.Columns > 1 then
-            function Section:ResolveElementParent()
-                local selectedColumn = columnFrames[1]
-                local selectedHeight = math.huge
+        local function getAvailableWidth()
+            local width = columnsRoot and columnsRoot.AbsoluteSize.X or 0
+            if width <= 0 then
+                width = Main.Content.AbsoluteSize.X
+            end
+            return width
+        end
 
-                for _, column in ipairs(columnFrames) do
-                    local contentHeight = column.UIListLayout.AbsoluteContentSize.Y
-                    local height = contentHeight > 0 and contentHeight or #column:GetChildren()
+        local function getActiveColumnCount()
+            if Section.Columns <= 1 then
+                return 1
+            end
 
-                    if height < selectedHeight then
-                        selectedHeight = height
-                        selectedColumn = column
+            local width = getAvailableWidth()
+            if width <= 0 then
+                return 1
+            end
+
+            local count = math.floor((width + Config.Tab.Gap) / (Section.MinColumnWidth + Config.Tab.Gap))
+            return math.clamp(count, 1, Section.Columns)
+        end
+
+        local function updateColumnsLayout()
+            if not columnsRoot or not columnsLayout then
+                return
+            end
+
+            activeColumnCount = getActiveColumnCount()
+            columnsLayout.FillDirection = activeColumnCount > 1 and "Horizontal" or "Vertical"
+
+            local totalGap = Config.Tab.Gap * math.max(activeColumnCount - 1, 0)
+            local baseOffset = activeColumnCount > 0 and -math.floor(totalGap / activeColumnCount) or 0
+            local remainder = activeColumnCount > 0 and (totalGap % activeColumnCount) or 0
+
+            for index, column in ipairs(columnFrames) do
+                local isActive = index <= activeColumnCount
+                column.Visible = isActive
+
+                if isActive and activeColumnCount > 1 then
+                    local offset = baseOffset
+                    if index <= remainder then
+                        offset = offset - 1
+                    end
+                    column.Size = UDim2.new(1 / activeColumnCount, offset, 0, 0)
+                else
+                    column.Size = UDim2.new(1, 0, 0, 0)
+                end
+            end
+
+            local currentColumn = 1
+            for _, element in ipairs(Section.Elements) do
+                if element.ElementFrame then
+                    element.ElementFrame.Parent = columnFrames[currentColumn]
+                    currentColumn = currentColumn + 1
+                    if currentColumn > activeColumnCount then
+                        currentColumn = 1
                     end
                 end
+            end
+        end
 
-                return selectedColumn
+        if Section.Columns > 1 then
+            function Section:ResolveElementParent()
+                updateColumnsLayout()
+                return columnFrames[1]
             end
         end
 
@@ -290,7 +346,17 @@ function Element:New(Config)
                 ChevronIconFrame.Visible = true
                 UpdateTitleSize()
             end
+            if Section.Columns > 1 then
+                updateColumnsLayout()
+            end
         end, ElementsModule, Config.UIScale, Config.Tab)
+
+        if Section.Columns > 1 and columnsRoot then
+            Creator.AddSignal(Main.Content:GetPropertyChangedSignal("AbsoluteSize"), function()
+                updateColumnsLayout()
+            end)
+            task.defer(updateColumnsLayout)
+        end
 
 
         UpdateTitleSize()

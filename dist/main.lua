@@ -1094,8 +1094,14 @@ CornerRadius=UDim.new(0,z),
 }),
 }),
 })
+local function getImageLabel()
+return H:FindFirstChild"ImageLabel"or H:FindFirstChildOfClass"ImageLabel"
+end
 if p.Icon(v)then
-H.ImageLabel:Destroy()
+local I=getImageLabel()
+if I then
+I:Destroy()
+end
 
 local J=l.Image{
 Icon=v,
@@ -1124,7 +1130,10 @@ end
 
 local M,N=pcall(getcustomasset,J)
 if M then
-H.ImageLabel.Image=N
+local O=getImageLabel()
+if O then
+O.Image=N
+end
 else
 warn(
 string.format(
@@ -1150,7 +1159,10 @@ end
 elseif v==""then
 H.Visible=false
 else
-H.ImageLabel.Image=v
+local I=getImageLabel()
+if I then
+I.Image=v
+end
 end
 
 return H
@@ -9296,6 +9308,7 @@ TextTransparency=ak.TextTransparency or 0.05,
 DescTextTransparency=ak.DescTextTransparency or 0.4,
 Opened=ak.Opened or false,
 Columns=math.max(1,math.floor(ak.Columns or 1)),
+MinColumnWidth=ak.MinColumnWidth or 180,
 UIElements={},
 
 HeaderSize=42,
@@ -9423,6 +9436,9 @@ end
 
 local as={}
 local at={}
+local aC
+local aD
+local aE=1
 
 if al.Columns>1 then
 local au=ak.Tab.Gap*(al.Columns-1)
@@ -9528,6 +9544,9 @@ table.unpack(at),
 
 al.ElementFrame=ar
 
+aC=ar.Content:FindFirstChild"Columns"
+aD=aC and aC:FindFirstChildOfClass"UIListLayout"or nil
+
 if aq then
 ar.Top:GetPropertyChangedSignal"AbsoluteSize":Connect(function()
 ar.Content.Position=UDim2.new(0,0,0,ar.Top.AbsoluteSize.Y/ak.UIScale)
@@ -9539,22 +9558,71 @@ end
 
 local au=ak.ElementsModule
 
-if al.Columns>1 then
-function al.ResolveElementParent(av)
-local aw=as[1]
-local ax=math.huge
+local function getAvailableWidth()
+local av=aC and aC.AbsoluteSize.X or 0
+if av<=0 then
+av=ar.Content.AbsoluteSize.X
+end
+return av
+end
+
+local function getActiveColumnCount()
+if al.Columns<=1 then
+return 1
+end
+
+local av=getAvailableWidth()
+if av<=0 then
+return 1
+end
+
+local aw=math.floor((av+ak.Tab.Gap)/(al.MinColumnWidth+ak.Tab.Gap))
+return math.clamp(aw,1,al.Columns)
+end
+
+local function updateColumnsLayout()
+if not aC or not aD then
+return
+end
+
+aE=getActiveColumnCount()
+aD.FillDirection=aE>1 and"Horizontal"or"Vertical"
+
+local av=ak.Tab.Gap*math.max(aE-1,0)
+local aw=aE>0 and-math.floor(av/aE)or 0
+local ax=aE>0 and(av%aE)or 0
 
 for ay,az in ipairs(as)do
-local aA=az.UIListLayout.AbsoluteContentSize.Y
-local aB=aA>0 and aA or#az:GetChildren()
+local aA=ay<=aE
+az.Visible=aA
 
-if aB<ax then
-ax=aB
-aw=az
+if aA and aE>1 then
+local aB=aw
+if ay<=ax then
+aB=aB-1
+end
+az.Size=UDim2.new(1/aE,aB,0,0)
+else
+az.Size=UDim2.new(1,0,0,0)
 end
 end
 
-return aw
+local ay=1
+for az,aA in ipairs(al.Elements)do
+if aA.ElementFrame then
+aA.ElementFrame.Parent=as[ay]
+ay=ay+1
+if ay>aE then
+ay=1
+end
+end
+end
+end
+
+if al.Columns>1 then
+function al.ResolveElementParent(av)
+updateColumnsLayout()
+return as[1]
 end
 end
 
@@ -9564,7 +9632,17 @@ al.Expandable=true
 an.Visible=true
 UpdateTitleSize()
 end
+if al.Columns>1 then
+updateColumnsLayout()
+end
 end,au,ak.UIScale,ak.Tab)
+
+if al.Columns>1 and aC then
+aa.AddSignal(ar.Content:GetPropertyChangedSignal"AbsoluteSize",function()
+updateColumnsLayout()
+end)
+task.defer(updateColumnsLayout)
+end
 
 
 UpdateTitleSize()
@@ -10042,6 +10120,7 @@ Elements={},
 ContainerFrame=nil,
 UICorner=Window.UICorner-(Window.UIPadding/2),
 Columns=math.max(1,math.floor(an.Columns or 1)),
+MinColumnWidth=an.MinColumnWidth or 260,
 
 Gap=Window.NewElements and 1 or 6,
 
@@ -10324,6 +10403,8 @@ ap.ContainerFrame=ap.UIElements.ContainerFrameCanvas
 
 local au
 local av={}
+local aD
+local aE=1
 
 local function createSectionColumn(aw,ax)
 return aj("Frame",{
@@ -10377,27 +10458,76 @@ VerticalAlignment="Top",
 }),
 table.unpack(az),
 })
+aD=au.UIListLayout
+end
+
+local function getAvailableSectionWidth()
+local aw=au and au.AbsoluteSize.X or 0
+if aw<=0 then
+aw=ap.UIElements.ContainerFrame.AbsoluteSize.X
+end
+return aw
+end
+
+local function getActiveSectionColumnCount()
+if ap.Columns<=1 then
+return 1
+end
+
+local aw=getAvailableSectionWidth()
+if aw<=0 then
+return 1
+end
+
+local ax=math.floor((aw+ap.Gap)/(ap.MinColumnWidth+ap.Gap))
+return math.clamp(ax,1,ap.Columns)
+end
+
+local function updateSectionColumns()
+if not au then
+return
+end
+
+aE=getActiveSectionColumnCount()
+aD.FillDirection=aE>1 and"Horizontal"or"Vertical"
+
+local aw=ap.Gap*math.max(aE-1,0)
+local ax=aE>0 and-math.floor(aw/aE)or 0
+local ay=aE>0 and(aw%aE)or 0
+
+for az,aA in ipairs(av)do
+local aB=az<=aE
+aA.Visible=aB
+
+if aB and aE>1 then
+local aC=ax
+if az<=ay then
+aC=aC-1
+end
+aA.Size=UDim2.new(1/aE,aC,0,0)
+else
+aA.Size=UDim2.new(1,0,0,0)
+end
+end
+
+local az=1
+for aA,aB in ipairs(ap.Elements)do
+if aB.__type=="Section"and aB.Box and aB.ElementFrame then
+aB.ElementFrame.Parent=av[az]
+az=az+1
+if az>aE then
+az=1
+end
+end
+end
 end
 
 if ap.Columns>1 then
 function ap.ResolveElementParent(aw,ax)
 if ax.ElementType=="Section"and ax.Box then
 ensureSectionColumns()
-
-local ay=av[1]
-local az=math.huge
-
-for aA,aB in ipairs(av)do
-local aC=aB.UIListLayout.AbsoluteContentSize.Y
-local aD=aC>0 and aC or#aB:GetChildren()
-
-if aD<az then
-az=aD
-ay=aB
-end
-end
-
-return ay
+updateSectionColumns()
+return av[1]
 end
 
 return ap.UIElements.ContainerFrame
@@ -10509,10 +10639,23 @@ ap.UIElements.ContainerFrame,
 ay.Elements,
 Window,
 WindUI,
-nil,
+function(az)
+if ap.Columns>1 and az.__type=="Section"and az.Box then
+ensureSectionColumns()
+updateSectionColumns()
+end
+end,
 ay,
 ao
 )
+
+if ap.Columns>1 then
+ah.AddSignal(ap.UIElements.ContainerFrame:GetPropertyChangedSignal"AbsoluteSize",function()
+if au then
+updateSectionColumns()
+end
+end)
+end
 
 function ap.LockAll(az)
 
