@@ -344,6 +344,7 @@ function TabModule.New(Config, UIScale)
 	local sectionColumnFrames = {}
 	local sectionColumnsLayout
 	local activeSectionColumnCount = 1
+	local nextSectionColumnIndex = 1
 
 	local function createSectionColumn(parent, size)
 		return New("Frame", {
@@ -416,7 +417,7 @@ function TabModule.New(Config, UIScale)
 
 		local width = getAvailableSectionWidth()
 		if width <= 0 then
-			return 1
+			return Tab.Columns
 		end
 
 		local count = math.floor((width + Tab.Gap) / (Tab.MinColumnWidth + Tab.Gap))
@@ -466,8 +467,13 @@ function TabModule.New(Config, UIScale)
 		function Tab:ResolveElementParent(config)
 			if config.ElementType == "Section" and config.Box then
 				ensureSectionColumns()
-				updateSectionColumns()
-				return sectionColumnFrames[1]
+				local targetIndex = math.clamp(nextSectionColumnIndex, 1, Tab.Columns)
+				nextSectionColumnIndex = nextSectionColumnIndex + 1
+				if nextSectionColumnIndex > Tab.Columns then
+					nextSectionColumnIndex = 1
+				end
+				task.defer(updateSectionColumns)
+				return sectionColumnFrames[targetIndex]
 			end
 
 			return Tab.UIElements.ContainerFrame

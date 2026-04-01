@@ -9439,6 +9439,7 @@ local at={}
 local aC
 local aD
 local aE=1
+local aF=1
 
 if al.Columns>1 then
 local au=ak.Tab.Gap*(al.Columns-1)
@@ -9573,7 +9574,7 @@ end
 
 local av=getAvailableWidth()
 if av<=0 then
-return 1
+return al.Columns
 end
 
 local aw=math.floor((av+ak.Tab.Gap)/(al.MinColumnWidth+ak.Tab.Gap))
@@ -9621,8 +9622,13 @@ end
 
 if al.Columns>1 then
 function al.ResolveElementParent(av)
-updateColumnsLayout()
-return as[1]
+local aw=math.clamp(aF,1,al.Columns)
+aF=aF+1
+if aF>al.Columns then
+aF=1
+end
+task.defer(updateColumnsLayout)
+return as[aw]
 end
 end
 
@@ -10405,6 +10411,7 @@ local au
 local av={}
 local aD
 local aE=1
+local aF=1
 
 local function createSectionColumn(aw,ax)
 return aj("Frame",{
@@ -10476,7 +10483,7 @@ end
 
 local aw=getAvailableSectionWidth()
 if aw<=0 then
-return 1
+return ap.Columns
 end
 
 local ax=math.floor((aw+ap.Gap)/(ap.MinColumnWidth+ap.Gap))
@@ -10526,8 +10533,13 @@ if ap.Columns>1 then
 function ap.ResolveElementParent(aw,ax)
 if ax.ElementType=="Section"and ax.Box then
 ensureSectionColumns()
-updateSectionColumns()
-return av[1]
+local ay=math.clamp(aF,1,ap.Columns)
+aF=aF+1
+if aF>ap.Columns then
+aF=1
+end
+task.defer(updateSectionColumns)
+return av[ay]
 end
 
 return ap.UIElements.ContainerFrame

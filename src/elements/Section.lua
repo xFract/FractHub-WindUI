@@ -153,6 +153,7 @@ function Element:New(Config)
     local columnsRoot
     local columnsLayout
     local activeColumnCount = 1
+    local nextColumnIndex = 1
 
     if Section.Columns > 1 then
         local totalGap = Config.Tab.Gap * (Section.Columns - 1)
@@ -287,7 +288,7 @@ function Element:New(Config)
 
             local width = getAvailableWidth()
             if width <= 0 then
-                return 1
+                return Section.Columns
             end
 
             local count = math.floor((width + Config.Tab.Gap) / (Section.MinColumnWidth + Config.Tab.Gap))
@@ -335,8 +336,13 @@ function Element:New(Config)
 
         if Section.Columns > 1 then
             function Section:ResolveElementParent()
-                updateColumnsLayout()
-                return columnFrames[1]
+                local targetIndex = math.clamp(nextColumnIndex, 1, Section.Columns)
+                nextColumnIndex = nextColumnIndex + 1
+                if nextColumnIndex > Section.Columns then
+                    nextColumnIndex = 1
+                end
+                task.defer(updateColumnsLayout)
+                return columnFrames[targetIndex]
             end
         end
 
