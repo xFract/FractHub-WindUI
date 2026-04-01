@@ -9593,9 +9593,19 @@ local av=ak.Tab.Gap*math.max(aE-1,0)
 local aw=aE>0 and-math.floor(av/aE)or 0
 local ax=aE>0 and(av%aE)or 0
 
+local ay=1
+for az,aA in ipairs(al.Elements)do
+if aA.ElementFrame then
+aA.ElementFrame.Parent=as[math.clamp(aA.AssignedColumnIndex or ay,1,aE)]
+ay=ay+1
+if ay>aE then
+ay=1
+end
+end
+end
+
 for ay,az in ipairs(as)do
 local aA=ay<=aE
-az.Visible=aA
 
 if aA and aE>1 then
 local aB=aw
@@ -9606,17 +9616,8 @@ az.Size=UDim2.new(1/aE,aB,0,0)
 else
 az.Size=UDim2.new(1,0,0,0)
 end
-end
 
-local ay=1
-for az,aA in ipairs(al.Elements)do
-if aA.ElementFrame then
-aA.ElementFrame.Parent=as[math.clamp(aA.AssignedColumnIndex or ay,1,aE)]
-ay=ay+1
-if ay>aE then
-ay=1
-end
-end
+az.Visible=aA
 end
 end
 
@@ -10506,9 +10507,19 @@ local aw=ap.Gap*math.max(aE-1,0)
 local ax=aE>0 and-math.floor(aw/aE)or 0
 local ay=aE>0 and(aw%aE)or 0
 
+local az=1
+for aA,aB in ipairs(ap.Elements)do
+if aB.__type=="Section"and aB.Box and aB.ElementFrame then
+aB.ElementFrame.Parent=av[math.clamp(aB.AssignedColumnIndex or az,1,aE)]
+az=az+1
+if az>aE then
+az=1
+end
+end
+end
+
 for az,aA in ipairs(av)do
 local aB=az<=aE
-aA.Visible=aB
 
 if aB and aE>1 then
 local aC=ax
@@ -10519,17 +10530,8 @@ aA.Size=UDim2.new(1/aE,aC,0,0)
 else
 aA.Size=UDim2.new(1,0,0,0)
 end
-end
 
-local az=1
-for aA,aB in ipairs(ap.Elements)do
-if aB.__type=="Section"and aB.Box and aB.ElementFrame then
-aB.ElementFrame.Parent=av[math.clamp(aB.AssignedColumnIndex or az,1,aE)]
-az=az+1
-if az>aE then
-az=1
-end
-end
+aA.Visible=aB
 end
 end
 

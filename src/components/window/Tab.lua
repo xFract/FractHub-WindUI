@@ -436,21 +436,6 @@ function TabModule.New(Config, UIScale)
 		local baseOffset = activeSectionColumnCount > 0 and -math.floor(totalGap / activeSectionColumnCount) or 0
 		local remainder = activeSectionColumnCount > 0 and (totalGap % activeSectionColumnCount) or 0
 
-		for index, column in ipairs(sectionColumnFrames) do
-			local isActive = index <= activeSectionColumnCount
-			column.Visible = isActive
-
-			if isActive and activeSectionColumnCount > 1 then
-				local offset = baseOffset
-				if index <= remainder then
-					offset = offset - 1
-				end
-				column.Size = UDim2.new(1 / activeSectionColumnCount, offset, 0, 0)
-			else
-				column.Size = UDim2.new(1, 0, 0, 0)
-			end
-		end
-
 		local currentColumn = 1
 		for _, element in ipairs(Tab.Elements) do
 			if element.__type == "Section" and element.Box and element.ElementFrame then
@@ -461,6 +446,22 @@ function TabModule.New(Config, UIScale)
 					currentColumn = 1
 				end
 			end
+		end
+
+		for index, column in ipairs(sectionColumnFrames) do
+			local isActive = index <= activeSectionColumnCount
+
+			if isActive and activeSectionColumnCount > 1 then
+				local offset = baseOffset
+				if index <= remainder then
+					offset = offset - 1
+				end
+				column.Size = UDim2.new(1 / activeSectionColumnCount, offset, 0, 0)
+			else
+				column.Size = UDim2.new(1, 0, 0, 0)
+			end
+
+			column.Visible = isActive
 		end
 	end
 

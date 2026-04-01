@@ -307,21 +307,6 @@ function Element:New(Config)
             local baseOffset = activeColumnCount > 0 and -math.floor(totalGap / activeColumnCount) or 0
             local remainder = activeColumnCount > 0 and (totalGap % activeColumnCount) or 0
 
-            for index, column in ipairs(columnFrames) do
-                local isActive = index <= activeColumnCount
-                column.Visible = isActive
-
-                if isActive and activeColumnCount > 1 then
-                    local offset = baseOffset
-                    if index <= remainder then
-                        offset = offset - 1
-                    end
-                    column.Size = UDim2.new(1 / activeColumnCount, offset, 0, 0)
-                else
-                    column.Size = UDim2.new(1, 0, 0, 0)
-                end
-            end
-
             local currentColumn = 1
             for _, element in ipairs(Section.Elements) do
                 if element.ElementFrame then
@@ -332,6 +317,22 @@ function Element:New(Config)
                         currentColumn = 1
                     end
                 end
+            end
+
+            for index, column in ipairs(columnFrames) do
+                local isActive = index <= activeColumnCount
+
+                if isActive and activeColumnCount > 1 then
+                    local offset = baseOffset
+                    if index <= remainder then
+                        offset = offset - 1
+                    end
+                    column.Size = UDim2.new(1 / activeColumnCount, offset, 0, 0)
+                else
+                    column.Size = UDim2.new(1, 0, 0, 0)
+                end
+
+                column.Visible = isActive
             end
         end
 
