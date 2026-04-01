@@ -13566,9 +13566,12 @@ isResizing=true
 ay.Active=true
 initialSize=au.UIElements.Main.Size
 initialInputPosition=G.Position
+local az=ax:FindFirstChild"ImageLabel"or ax:FindFirstChildOfClass"ImageLabel"
 
 
-an(ax.ImageLabel,0.1,{ImageTransparency=0.35}):Play()
+if az then
+an(az,0.1,{ImageTransparency=0.35}):Play()
+end
 
 al.AddSignal(G.Changed,function()
 if G.UserInputState==Enum.UserInputState.End then
@@ -13576,7 +13579,9 @@ isResizing=false
 ay.Active=false
 
 
-an(ax.ImageLabel,0.17,{ImageTransparency=0.8}):Play()
+if az then
+an(az,0.17,{ImageTransparency=0.8}):Play()
+end
 end
 end)
 end
@@ -13620,12 +13625,18 @@ end)
 
 al.AddSignal(ax.MouseEnter,function()
 if not isResizing then
-an(ax.ImageLabel,0.1,{ImageTransparency=0.35}):Play()
+local az=ax:FindFirstChild"ImageLabel"or ax:FindFirstChildOfClass"ImageLabel"
+if az then
+an(az,0.1,{ImageTransparency=0.35}):Play()
+end
 end
 end)
 al.AddSignal(ax.MouseLeave,function()
 if not isResizing then
-an(ax.ImageLabel,0.17,{ImageTransparency=0.8}):Play()
+local az=ax:FindFirstChild"ImageLabel"or ax:FindFirstChildOfClass"ImageLabel"
+if az then
+an(az,0.17,{ImageTransparency=0.8}):Play()
+end
 end
 end)
 

@@ -2058,9 +2058,13 @@ return function(Config)
 			FullScreenIcon.Active = true
 			initialSize = Window.UIElements.Main.Size
 			initialInputPosition = input.Position
+			local resizeHandleImageLabel =
+				ResizeHandle:FindFirstChild("ImageLabel") or ResizeHandle:FindFirstChildOfClass("ImageLabel")
 			--Tween(FullScreenIcon, 0.12, {ImageTransparency = .65}):Play()
 			--Tween(FullScreenIcon.ImageLabel, 0.12, {ImageTransparency = 0}):Play()
-			Tween(ResizeHandle.ImageLabel, 0.1, { ImageTransparency = 0.35 }):Play()
+			if resizeHandleImageLabel then
+				Tween(resizeHandleImageLabel, 0.1, { ImageTransparency = 0.35 }):Play()
+			end
 
 			Creator.AddSignal(input.Changed, function()
 				if input.UserInputState == Enum.UserInputState.End then
@@ -2068,7 +2072,9 @@ return function(Config)
 					FullScreenIcon.Active = false
 					--Tween(FullScreenIcon, 0.2, {ImageTransparency = 1}):Play()
 					--Tween(FullScreenIcon.ImageLabel, 0.17, {ImageTransparency = 1}):Play()
-					Tween(ResizeHandle.ImageLabel, 0.17, { ImageTransparency = 0.8 }):Play()
+					if resizeHandleImageLabel then
+						Tween(resizeHandleImageLabel, 0.17, { ImageTransparency = 0.8 }):Play()
+					end
 				end
 			end)
 		end
@@ -2112,12 +2118,20 @@ return function(Config)
 
 	Creator.AddSignal(ResizeHandle.MouseEnter, function()
 		if not isResizing then
-			Tween(ResizeHandle.ImageLabel, 0.1, { ImageTransparency = 0.35 }):Play()
+			local resizeHandleImageLabel =
+				ResizeHandle:FindFirstChild("ImageLabel") or ResizeHandle:FindFirstChildOfClass("ImageLabel")
+			if resizeHandleImageLabel then
+				Tween(resizeHandleImageLabel, 0.1, { ImageTransparency = 0.35 }):Play()
+			end
 		end
 	end)
 	Creator.AddSignal(ResizeHandle.MouseLeave, function()
 		if not isResizing then
-			Tween(ResizeHandle.ImageLabel, 0.17, { ImageTransparency = 0.8 }):Play()
+			local resizeHandleImageLabel =
+				ResizeHandle:FindFirstChild("ImageLabel") or ResizeHandle:FindFirstChildOfClass("ImageLabel")
+			if resizeHandleImageLabel then
+				Tween(resizeHandleImageLabel, 0.17, { ImageTransparency = 0.8 }):Play()
+			end
 		end
 	end)
 
