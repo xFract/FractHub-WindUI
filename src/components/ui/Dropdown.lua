@@ -563,9 +563,6 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 								end
 								table.insert(Dropdown.Value, TabMain.Original)
 							else
-								if not Dropdown.AllowNone and #Dropdown.Value == 1 then
-									return
-								end
 								TabMain.Selected = false
 								Tween(TabMain.UIElements.TabItem, 0.1, { ImageTransparency = 1 }):Play()
 								Tween(TabMain.UIElements.TabItem.Highlight, 0.1, { ImageTransparency = 1 }):Play()
