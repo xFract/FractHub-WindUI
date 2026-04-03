@@ -17,6 +17,7 @@
 local a a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()local b=(cloneref or clonereference or function(b)return b end)
 
 local d=b(game:GetService"ReplicatedStorage":WaitForChild("GetIcons",99999):InvokeServer())
+local c=Instance.new
 
 local function parseIconString(e)
 if type(e)=="string"then
@@ -204,7 +205,7 @@ end
 
 g.IconFrame=p
 else
-local m=Instance.new"ImageLabel"
+local m=c"ImageLabel"
 m.Size=g.Size
 m.BackgroundTransparency=1
 m.ImageColor3=h[1].Color
@@ -218,7 +219,7 @@ if not l and j[2].Parts then
 for p,r in next,j[2].Parts do
 local u=d.Icon(r,g.Type)
 
-local v=Instance.New"ImageLabel"
+local v=c"ImageLabel"
 v.Size=UDim2.new(1,0,1,0)
 v.BackgroundTransparency=1
 v.ImageColor3=h[1+p].Color
@@ -362,18 +363,18 @@ local d=b(game:GetService"RunService")
 local e=b(game:GetService"UserInputService")
 local f=b(game:GetService"TweenService")
 local g=b(game:GetService"LocalizationService")
-local h=b(game:GetService"HttpService")local i=
-
+local h=b(game:GetService"HttpService")local i=Instance.new
+local j=
 d.Heartbeat
 
-local j="https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"
+local k="https://raw.githubusercontent.com/Footagesus/Icons/main/Main-v2.lua"
 
 local l
 if d:IsStudio()or not writefile then
 l=a.load'a'
 else
 l=loadstring(
-game.HttpGetAsync and game:HttpGetAsync(j)or h:GetAsync(j)
+game.HttpGetAsync and game:HttpGetAsync(k)or h:GetAsync(k)
 )()
 end
 
@@ -721,7 +722,7 @@ B.Object[C]=Color3.new(1,1,1)
 
 local H=B.Object:FindFirstChild"LibraryGradient"
 if not H then
-H=Instance.new"UIGradient"
+H=i"UIGradient"
 H.Name="LibraryGradient"
 H.Parent=B.Object
 end
@@ -852,7 +853,7 @@ return l.AddIcons(r,u)
 end
 
 function p.New(r,u,v)
-local x=Instance.new(r)
+local x=i(r)
 
 for z,A in next,p.DefaultProperties[r]or{}do
 x[z]=A
@@ -3129,18 +3130,19 @@ return{viewportPointToWorld,getOffset}end function a.q()
 
 
 local aa=(cloneref or clonereference or function(aa)return aa end)
+local ad=Instance.new
 
 
 local ab=a.load'c'
 local ac=ab.New
 
 
-local ad,ae=unpack(a.load'p')
-local af=Instance.new("Folder",aa(game:GetService"Workspace").CurrentCamera)
+local ae,af=unpack(a.load'p')
+local ag=ad("Folder",aa(game:GetService"Workspace").CurrentCamera)
 
 
 local function createAcrylic()
-local ag=ac("Part",{
+local ah=ac("Part",{
 Name="Body",
 Color=Color3.new(0,0,0),
 Material=Enum.Material.Glass,
@@ -3157,120 +3159,120 @@ Offset=Vector3.new(0,0,-1E-6),
 }),
 })
 
-return ag
+return ah
 end
 
 
-local function createAcrylicBlur(ag)
-local ah={}
+local function createAcrylicBlur(ah)
+local ai={}
 
-ag=ag or 0.001
-local ai={
+ah=ah or 0.001
+local aj={
 topLeft=Vector2.new(),
 topRight=Vector2.new(),
 bottomRight=Vector2.new(),
 }
-local aj=createAcrylic()
-aj.Parent=af
+local ak=createAcrylic()
+ak.Parent=ag
 
-local function updatePositions(ak,al)
-ai.topLeft=al
-ai.topRight=al+Vector2.new(ak.X,0)
-ai.bottomRight=al+ak
+local function updatePositions(al,am)
+aj.topLeft=am
+aj.topRight=am+Vector2.new(al.X,0)
+aj.bottomRight=am+al
 end
 
 local function render()
-local ak=aa(game:GetService"Workspace").CurrentCamera
-if ak then
-ak=ak.CFrame
+local al=aa(game:GetService"Workspace").CurrentCamera
+if al then
+al=al.CFrame
 end
-local al=ak
-if not al then
-al=CFrame.new()
-end
-
 local am=al
-local an=ai.topLeft
-local ao=ai.topRight
-local ap=ai.bottomRight
-
-local aq=ad(an,ag)
-local ar=ad(ao,ag)
-local as=ad(ap,ag)
-
-local at=(ar-aq).Magnitude
-local au=(ar-as).Magnitude
-
-aj.CFrame=
-CFrame.fromMatrix((aq+as)/2,am.XVector,am.YVector,am.ZVector)
-aj.Mesh.Scale=Vector3.new(at,au,0)
+if not am then
+am=CFrame.new()
 end
 
-local function onChange(ak)
-local al=ae()
-local am=ak.AbsoluteSize-Vector2.new(al,al)
-local an=ak.AbsolutePosition+Vector2.new(al/2,al/2)
+local an=am
+local ao=aj.topLeft
+local ap=aj.topRight
+local aq=aj.bottomRight
 
-updatePositions(am,an)
+local ar=ae(ao,ah)
+local as=ae(ap,ah)
+local at=ae(aq,ah)
+
+local au=(as-ar).Magnitude
+local av=(as-at).Magnitude
+
+ak.CFrame=
+CFrame.fromMatrix((ar+at)/2,an.XVector,an.YVector,an.ZVector)
+ak.Mesh.Scale=Vector3.new(au,av,0)
+end
+
+local function onChange(al)
+local am=af()
+local an=al.AbsoluteSize-Vector2.new(am,am)
+local ao=al.AbsolutePosition+Vector2.new(am/2,am/2)
+
+updatePositions(an,ao)
 task.spawn(render)
 end
 
 local function renderOnChange()
-local ak=aa(game:GetService"Workspace").CurrentCamera
-if not ak then
+local al=aa(game:GetService"Workspace").CurrentCamera
+if not al then
 return
 end
 
-table.insert(ah,ak:GetPropertyChangedSignal"CFrame":Connect(render))
-table.insert(ah,ak:GetPropertyChangedSignal"ViewportSize":Connect(render))
-table.insert(ah,ak:GetPropertyChangedSignal"FieldOfView":Connect(render))
+table.insert(ai,al:GetPropertyChangedSignal"CFrame":Connect(render))
+table.insert(ai,al:GetPropertyChangedSignal"ViewportSize":Connect(render))
+table.insert(ai,al:GetPropertyChangedSignal"FieldOfView":Connect(render))
 task.spawn(render)
 end
 
-aj.Destroying:Connect(function()
-for ak,al in ah do
+ak.Destroying:Connect(function()
+for al,am in ai do
 pcall(function()
-al:Disconnect()
+am:Disconnect()
 end)
 end
 end)
 
 renderOnChange()
 
-return onChange,aj
+return onChange,ak
 end
 
-return function(ag)
-local ah={}
-local ai,aj=createAcrylicBlur(ag)
+return function(ah)
+local ai={}
+local aj,ak=createAcrylicBlur(ah)
 
-local ak=ac("Frame",{
+local al=ac("Frame",{
 BackgroundTransparency=1,
 Size=UDim2.fromScale(1,1),
 })
 
-ab.AddSignal(ak:GetPropertyChangedSignal"AbsolutePosition",function()
-ai(ak)
+ab.AddSignal(al:GetPropertyChangedSignal"AbsolutePosition",function()
+aj(al)
 end)
 
-ab.AddSignal(ak:GetPropertyChangedSignal"AbsoluteSize",function()
-ai(ak)
+ab.AddSignal(al:GetPropertyChangedSignal"AbsoluteSize",function()
+aj(al)
 end)
 
-ah.AddParent=function(al)
-ab.AddSignal(al:GetPropertyChangedSignal"Visible",function()
+ai.AddParent=function(am)
+ab.AddSignal(am:GetPropertyChangedSignal"Visible",function()
 
 end)
 end
 
-ah.SetVisibility=function(al)
-aj.Transparency=al and 0.98 or 1
+ai.SetVisibility=function(am)
+ak.Transparency=am and 0.98 or 1
 end
 
-ah.Frame=ak
-ah.Model=aj
+ai.Frame=al
+ai.Model=ak
 
-return ah
+return ai
 end end function a.r()
 
 
@@ -3400,6 +3402,7 @@ end end function a.s()
 
 
 local aa=(cloneref or clonereference or function(aa)return aa end)
+local ac=Instance.new
 
 
 local ab={
@@ -3409,41 +3412,41 @@ AcrylicPaint=a.load'r',
 }
 
 function ab.init()
-local ac=Instance.new"DepthOfFieldEffect"
-ac.FarIntensity=0
-ac.InFocusRadius=0.1
-ac.NearIntensity=1
+local ad=ac"DepthOfFieldEffect"
+ad.FarIntensity=0
+ad.InFocusRadius=0.1
+ad.NearIntensity=1
 
-local ad={}
+local ae={}
 
 function ab.Enable()
-for ae,af in pairs(ad)do
-af.Enabled=false
+for af,ag in pairs(ae)do
+ag.Enabled=false
 end
-ac.Parent=aa(game:GetService"Lighting")
+ad.Parent=aa(game:GetService"Lighting")
 end
 
 function ab.Disable()
-for ae,af in pairs(ad)do
-af.Enabled=af.enabled
+for af,ag in pairs(ae)do
+ag.Enabled=ag.enabled
 end
-ac.Parent=nil
+ad.Parent=nil
 end
 
 local function registerDefaults()
-local function register(ae)
-if ae:IsA"DepthOfFieldEffect"then
-ad[ae]={enabled=ae.Enabled}
+local function register(af)
+if af:IsA"DepthOfFieldEffect"then
+ae[af]={enabled=af.Enabled}
 end
 end
 
-for ae,af in pairs(aa(game:GetService"Lighting"):GetChildren())do
-register(af)
+for af,ag in pairs(aa(game:GetService"Lighting"):GetChildren())do
+register(ag)
 end
 
 if aa(game:GetService"Workspace").CurrentCamera then
-for ae,af in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
-register(af)
+for af,ag in pairs(aa(game:GetService"Workspace").CurrentCamera:GetChildren())do
+register(ag)
 end
 end
 end

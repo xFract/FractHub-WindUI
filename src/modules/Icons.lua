@@ -1,4 +1,5 @@
 local cloneref = (cloneref or clonereference or function(instance) return instance end)
+local createInstance = Instance.new
 
 local IconModule = cloneref(game:GetService("ReplicatedStorage"):WaitForChild("GetIcons", 99999):InvokeServer())
 
@@ -188,7 +189,7 @@ function IconModule.Image(IconConfig)
           
         Icon.IconFrame = IconFrame  
     else  
-        local IconFrame = Instance.new("ImageLabel")  
+        local IconFrame = createInstance("ImageLabel")  
         IconFrame.Size = Icon.Size  
         IconFrame.BackgroundTransparency = 1  
         IconFrame.ImageColor3 = Colors[1].Color  
@@ -202,7 +203,7 @@ function IconModule.Image(IconConfig)
             for _, part in next, IconLabel[2].Parts do  
                 local IconPartLabel = IconModule.Icon(part, Icon.Type)  
                   
-                local IconPart = Instance.New("ImageLabel")  
+                local IconPart = createInstance("ImageLabel")  
                 IconPart.Size = UDim2.new(1,0,1,0)  
                 IconPart.BackgroundTransparency = 1  
                 IconPart.ImageColor3 = Colors[1 + _].Color  

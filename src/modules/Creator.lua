@@ -7,6 +7,7 @@ local UserInputService = cloneref(game:GetService("UserInputService"))
 local TweenService = cloneref(game:GetService("TweenService"))
 local LocalizationService = cloneref(game:GetService("LocalizationService"))
 local HttpService = cloneref(game:GetService("HttpService"))
+local createInstance = Instance.new
 
 local RenderStepped = RunService.Heartbeat
 
@@ -365,7 +366,7 @@ function Creator.UpdateTheme(TargetObject, isTween, isTweenTarget, Duration, Eas
 
 					local gradient = objData.Object:FindFirstChild("LibraryGradient")
 					if not gradient then
-						gradient = Instance.new("UIGradient")
+						gradient = createInstance("UIGradient")
 						gradient.Name = "LibraryGradient"
 						gradient.Parent = objData.Object
 					end
@@ -496,7 +497,7 @@ function Creator.AddIcons(packName, iconsData)
 end
 
 function Creator.New(Name, Properties, Children)
-	local Object = Instance.new(Name)
+	local Object = createInstance(Name)
 
 	for Name, Value in next, Creator.DefaultProperties[Name] or {} do
 		Object[Name] = Value

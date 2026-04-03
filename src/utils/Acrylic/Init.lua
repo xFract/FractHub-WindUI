@@ -1,6 +1,7 @@
 -- Credits: Fluent - Dawid
 
 local cloneref = (cloneref or clonereference or function(instance) return instance end)
+local createInstance = Instance.new
 
 
 local Acrylic = {
@@ -10,7 +11,7 @@ local Acrylic = {
 }
 
 function Acrylic.init()
-	local baseEffect = Instance.new("DepthOfFieldEffect")
+	local baseEffect = createInstance("DepthOfFieldEffect")
 	baseEffect.FarIntensity = 0
 	baseEffect.InFocusRadius = 0.1
 	baseEffect.NearIntensity = 1
