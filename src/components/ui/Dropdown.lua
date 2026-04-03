@@ -680,6 +680,10 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
 		end
 	end
 
+	function DropdownModule:SetValues(Values, shouldCallback)
+		return DropdownModule:Refresh(Values, shouldCallback)
+	end
+
 	function DropdownModule:Close()
 		Dropdown.Opened = false
 

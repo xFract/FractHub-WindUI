@@ -6,6 +6,7 @@ local HttpService = game:GetService("HttpService")
 ConfigAddon.Folder = "WindUI"
 ConfigAddon.DefaultConfigName = "default"
 ConfigAddon.AutoLoad = true
+ConfigAddon.MinimumConfigVersion = 1.2
 
 function ConfigAddon:SetLibrary(library)
 	self.Library = library
@@ -22,12 +23,65 @@ function ConfigAddon:SetDefaultConfigName(configName)
 	end
 end
 
+function ConfigAddon:IsSupportedConfigData(decoded)
+	if type(decoded) ~= "table" then
+		return false
+	end
+
+	local version = decoded.__version
+	if type(version) ~= "number" then
+		return false
+	end
+
+	return version >= self.MinimumConfigVersion
+end
+
+function ConfigAddon:IsSupportedConfigName(configName)
+	if not self.ConfigManager or not self.ConfigManager.Path or not isfile or not readfile then
+		return false
+	end
+
+	local path = self.ConfigManager.Path .. configName .. ".json"
+	if not isfile(path) then
+		return false
+	end
+
+	local readSuccess, decoded = pcall(function()
+		return HttpService:JSONDecode(readfile(path))
+	end)
+
+	return readSuccess and self:IsSupportedConfigData(decoded)
+end
+
 function ConfigAddon:GetConfigNames()
-	if not self.ConfigManager then
+	if not self.ConfigManager or not self.ConfigManager.Path or not listfiles or not readfile then
 		return {}
 	end
 
-	local names = self.ConfigManager:AllConfigs()
+	local names = {}
+	local success, files = pcall(function()
+		return listfiles(self.ConfigManager.Path)
+	end)
+
+	if not success or not files then
+		return names
+	end
+
+	for _, file in ipairs(files) do
+		if file:match("%.json$") then
+			local readSuccess, decoded = pcall(function()
+				return HttpService:JSONDecode(readfile(file))
+			end)
+
+			if readSuccess and self:IsSupportedConfigData(decoded) then
+				local fileName = file:match("([^\\/]+)%.json$")
+				if fileName then
+					table.insert(names, fileName)
+				end
+			end
+		end
+	end
+
 	table.sort(names)
 	return names
 end
@@ -51,7 +105,7 @@ function ConfigAddon:GetAutoLoadConfigName()
 				return HttpService:JSONDecode(readfile(file))
 			end)
 
-			if readSuccess and decoded and decoded.__autoload then
+			if readSuccess and self:IsSupportedConfigData(decoded) and decoded.__autoload then
 				return file:match("([^\\/]+)%.json$")
 			end
 		end
@@ -170,6 +224,11 @@ function ConfigAddon:BuildConfigSection(tab, options)
 				return
 			end
 
+			if not self:IsSupportedConfigName(configName) then
+				self:Notify("Unsupported Config", "Old config versions are not restored.", "triangle-alert")
+				return
+			end
+
 			self:EnsureConfig(configName, self.AutoLoad)
 		end,
 	})
@@ -256,6 +315,11 @@ function ConfigAddon:BuildConfigSection(tab, options)
 		Callback = function()
 			if not self.ConfigManager then
 				self:Notify("Config", "ConfigManager is not available here.", "triangle-alert")
+				return
+			end
+
+			if not self:IsSupportedConfigName(self.DefaultConfigName) then
+				self:Notify("Unsupported Config", "Old config versions are not restored.", "triangle-alert")
 				return
 			end
 
